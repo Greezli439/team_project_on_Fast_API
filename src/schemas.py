@@ -7,6 +7,8 @@ class UserModel(BaseModel):
     username: str = Field(min_length=3, max_length=16)
     email: str
     password: str = Field(min_length=6, max_length=16)
+    role: str = Field()
+
 
 
 class UserDb(BaseModel):
@@ -14,7 +16,8 @@ class UserDb(BaseModel):
     username: str
     email: str
     created_at: datetime
-    avatar: str
+    # avatar: str
+
 
     class Config:
         orm_mode = True
@@ -66,3 +69,4 @@ class CommentModel(BaseModel):
     comment: str = Field(min_length=1, max_length=255)
     user_id: int = Field(1, gt=0)
     image_id: int = Field(1, gt=0)
+

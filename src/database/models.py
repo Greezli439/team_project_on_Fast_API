@@ -1,4 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean, func, Table
+
+# from enum import Enum
+import enum
+
+from sqlalchemy import Column, Integer, String, Boolean, func, Table, Enum
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime
@@ -20,6 +25,7 @@ image_m2m_tag = Table(
 class Image(Base):
     __tablename__ = "images"
     id = Column(Integer, primary_key=True)
+
     url = Column(String(255), nullable=False)
     title = Column(String(50), nullable=False)
     description = Column(String(150), nullable=False)
@@ -48,23 +54,33 @@ class Comment(Base):
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
+    
+class Role(enum.Enum):
+    __tablename__ = 'users_roles'
+    admin: str = 'admin'
+    moderator: str = 'moderator'
+    user: str = 'user'
+
+      
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    nickname = Column(String(30), nullable=False, unique=True)
+    username = Column(String(30), nullable=False, unique=True)
     email = Column(String(100), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     # images = relationship(List('images'))
-    avatar = relationship('images')
+    # avatar = relationship('images', backref="users")
     created_at = Column('created_at', DateTime, default=func.now())
     refresh_token = Column(String(255))
     # logout_token = Column(String(255))
     confirmed = Column(Boolean, default=False)
     banned = Column(Boolean, default=False)
-    role = relationship('users_roles')
+    # role = relationship('users_roles')
+    role = Column('role', Enum(Role), default=Role.user)
 
 
-class Role(Base):
-    __tablename__ = 'users_roles'
-    id = Column(Integer, primary_key=True)
-    role_name = Column(String(30), nullable=False, unique=True)
+# class Role(Base):
+#     __tablename__ = 'users_roles'
+#     id = Column(Integer, primary_key=True)
+#     role_name = Column(String(30), nullable=False, unique=True)
+

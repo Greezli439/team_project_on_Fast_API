@@ -5,13 +5,18 @@ from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredent
 from sqlalchemy.orm import Session
 
 from src.database.db_connection import get_db
+
+from src.repository import users as repository_users
+
 from src.schemas import UserModel, UserResponse, TokenModel, ImageBase, ImageResponse, CommentsBase, CommentsResponce, CommentModel
 from src.repository import comments as repository_comments
+
 # from src.services.auth import auth_service
 
 router = APIRouter(prefix='/comments', tags=["comments"])
 
 security = HTTPBearer()
+
 
 #заменить на авторизированого пользователя
 @router.post('/edit/{comment_id}', response_model=CommentsResponce)
