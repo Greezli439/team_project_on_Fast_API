@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredent
 from sqlalchemy.orm import Session
 
 from src.database.db_connection import get_db
-from src.schemas import UserModel, UserResponse, TokenModel
+from src.schemas import UserModel, UserDb, UserResponse, TokenModel
 from src.repository import users as repository_users
 from src.services.users import auth_service
 
@@ -53,5 +53,8 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-
+@router.get("/all_users", response_model=list[UserDb])
+async def get_users(db: Session = Depends(get_db)):
+    users = await repository_users.get_users(db)
+    return users.all()
 

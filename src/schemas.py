@@ -7,6 +7,7 @@ class UserModel(BaseModel):
     username: str = Field(min_length=3, max_length=16)
     email: str
     password: str = Field(min_length=6, max_length=16)
+    role: str = Field()
 
 
 class UserDb(BaseModel):
