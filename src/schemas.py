@@ -56,12 +56,18 @@ class ImageResponse(ImageBase):
     id: int
     tags: List[TagResponse]
 
-class CommentsBase(BaseModel):
+
+class CommentRequest(BaseModel):
+    image_id: int
+
+
+class CommentBase(BaseModel):
     comment: str
 
-class CommentsResponce(CommentsBase):
-    username: str
-    edit_date: str
+class CommentResponse(CommentsBase):
+    # username: str
+    user_id: int
+    updated_at: datetime
 
 class TokenModel(BaseModel):
     access_token: str
