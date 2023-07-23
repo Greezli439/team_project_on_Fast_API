@@ -14,32 +14,34 @@ class UserModel(UserBase):
     role: str = Field()
 
 
-
 class UserDb(BaseModel):
     id: int
-    username: str
-    email: str
+    username: str = "Jack"
+    email: str = "jacck@jack.com"
     created_at: datetime
-    # avatar: str
 
+    # avatar: str
 
     class Config:
         orm_mode = True
 
 
 class UserResponse(BaseModel):
-    user: UserDb
+    username: UserDb
     detail: str = "User successfully created"
 
 
 class TagModel(BaseModel):
-    name: str = Field(max_length=25)
+    name_tag: str = Field(max_length=25)
 
 
 class TagResponse(TagModel):
-    id: int
+    id: int = 1
+    name_tag: str
+
     class Config:
         orm_mode = True
+
 
 class ImageBase(BaseModel):
     username: str
@@ -48,8 +50,10 @@ class ImageBase(BaseModel):
     url: str
     created_at: datetime
 
+
 class ImageModel(ImageBase):
     tags: List[int]
+
 
 class ImageResponse(ImageBase):
     user: UserDb
@@ -57,17 +61,24 @@ class ImageResponse(ImageBase):
     tags: List[TagResponse]
 
 
-class CommentRequest(BaseModel):
-    image_id: int
+class CommentDeleteResponse(BaseModel):
+    id: int = 1
+    comment: str = 'My comment'
+
+    class Config:
+        orm_mode = True
 
 
-class CommentBase(BaseModel):
+#
+class CommentResponse(BaseModel):
+    id: int = 1
     comment: str
+    username: UserDb
+    image_id: int = 1
 
-class CommentResponse(CommentsBase):
-    # username: str
-    user_id: int
-    updated_at: datetime
+    class Config:
+        orm_mode = True
+
 
 class TokenModel(BaseModel):
     access_token: str
@@ -76,7 +87,7 @@ class TokenModel(BaseModel):
 
 
 class CommentModel(BaseModel):
+    id: int
     comment: str = Field(min_length=1, max_length=255)
     user_id: int = Field(1, gt=0)
     image_id: int = Field(1, gt=0)
-

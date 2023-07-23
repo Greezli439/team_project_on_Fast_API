@@ -4,8 +4,13 @@ from src.database.models import Comment, Image
 from src.schemas import CommentModel
 
 
+async def get_comments(db: Session):
+    return db.query(Comment).all()
+
+
 async def get_comments_for_photo(image_id, db: Session):
     return db.query(Comment).filter_by(image_id=image_id).all()
+
 
 async def get_comment_by_id(comment_id: int, db: Session):
     return db.query(Comment).filter_by(id=comment_id).first()
