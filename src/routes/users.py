@@ -58,3 +58,10 @@ async def get_users(db: Session = Depends(get_db)):
     users = await repository_users.get_users(db)
     return users.all()
 
+
+@router.get("/secret")
+async def read_item(current_user: UserDb = Depends(auth_service.get_current_user)):
+    """
+    function for testing working authorisations
+    """
+    return {"message": 'secret router', "user": current_user.email}

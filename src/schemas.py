@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from fastapi import File
 
 class UserModel(BaseModel):
     username: str = Field(min_length=3, max_length=16)
-    email: str
+    email: EmailStr
     password: str = Field(min_length=6, max_length=16)
     role: str = Field()
 
@@ -13,7 +13,7 @@ class UserModel(BaseModel):
 class UserDb(BaseModel):
     id: int
     username: str
-    email: str
+    email: EmailStr
     created_at: datetime
     # avatar: str
 
