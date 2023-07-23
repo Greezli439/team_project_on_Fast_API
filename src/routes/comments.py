@@ -28,10 +28,11 @@ async def edit_comment_by_id(body: CommentModel,
     return comment
 
 
-@router.post('/{image_id}', response_model=CommentsResponce)
+@router.post('/{image_id}/', response_model=CommentsBase)
 async def add_new_comments(body: CommentModel,
                            db: Session = Depends(get_db)):
-    comment = repository_comments.create_comment(body, db)
+    comment = await repository_comments.create_comment(body, db)
+    print('****')
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
     return comment
@@ -40,7 +41,7 @@ async def add_new_comments(body: CommentModel,
 @router.get('/{image_id}', response_model=List[CommentsResponce])
 async def get_comments_for_photo(body: CommentModel,
                                     db: Session = Depends(get_db)):
-    comments = repository_comments.get_comments_for_photo(body, db)
+    comments = await repository_comments.get_comments_for_photo(body, db)
     if not comments:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
     return comments
@@ -48,7 +49,7 @@ async def get_comments_for_photo(body: CommentModel,
 @router.delete('/{comment_id}')
 async def remove_comment(comment_id: int,
                          db: Session = Depends(get_db)):
-    comment = repository_comments.remove_comment(comment_id, db)
+    comment = await repository_comments.remove_comment(comment_id, db)
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
     return comment

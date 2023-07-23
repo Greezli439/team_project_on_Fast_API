@@ -14,16 +14,15 @@ async def get_users(db: Session):
 async def get_user_by_email(email: str, db: Session) -> User | None:
     return db.query(User).filter(User.email == email).first()
 
+async def get_user_by_username(username: str, db: Session) -> User | None:
+    return db.query(User).filter(User.username == username).first()
+
 async def create_user(body: UserModel, db: Session) -> User:
     
     users = await get_users(db)
-    # new_user = User(**body.dict())
+    new_user = User(**body.dict())
     if not users.first():
-        new_user = User(**body.dict())
         new_user.role = 'admin'
-       
-    else:
-        new_user = User(**body.dict())
         
     avatar = ''
     try:
