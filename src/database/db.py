@@ -1,7 +1,9 @@
+
 # from enum import Enum
 import enum
 
 from sqlalchemy import Column, Integer, String, Boolean, func, Table, Enum
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime
@@ -23,12 +25,18 @@ image_m2m_tag = Table(
 class Image(Base):
     __tablename__ = "images"
     id = Column(Integer, primary_key=True)
-    title = Column(String(50), nullable=False)
+
     url = Column(String(255), nullable=False)
-    created_at = Column('created_at', DateTime, default=func.now())
+    title = Column(String(50), nullable=False)
     description = Column(String(150), nullable=False)
+    user_id = Column('user_id', ForeignKey(
+        'users.id', ondelete='CASCADE'), default=None)
     # comments = relationship(List('comments'))
+    user = relationship('User', backref="images")
     tags = relationship("Tag", secondary=image_m2m_tag, backref="images")
+    created_at = Column("created_at", DateTime, default=func.now())
+    updated_at = Column("updated_at", DateTime,
+                        default=func.now(), onupdate=func.now())
 
 
 class Tag(Base):
@@ -41,14 +49,23 @@ class Comment(Base):
     __tablename__ = "comments"
     id = Column(Integer, primary_key=True)
     comment = Column(String(255), nullable=False)
-    creation_data = Column('creation_data', DateTime, default=func.now())
-    edit_date = Column(DateTime)
+    user_id = Column("user_id", ForeignKey(
+        'users.id', ondelete='CASCADE'), default=None)
+    user = relationship("User", backref="comments")
+    image_id = Column("image_id", ForeignKey(
+        "image.id", ondelete="CASCADE"), default=None)
+    image = relationship("Image", backref="comments")
+    created_at = Column("created_at", DateTime, default=func.now())
+    updated_at = Column("updated_at", DateTime,
+                        default=func.now(), onupdate=func.now())
+
 
 class Role(enum.Enum):
-    # __tablename__ = 'users_roles'
+    __tablename__ = 'users_roles'
     admin: str = 'admin'
     moderator: str = 'moderator'
     user: str = 'user'
+
 
 class User(Base):
     __tablename__ = "users"

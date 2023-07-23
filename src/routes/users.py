@@ -5,10 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredent
 from sqlalchemy.orm import Session
 
 from src.database.db_connection import get_db
+from src.database.models import User, Role
 from src.schemas import UserModel, UserDb, UserResponse, TokenModel
 from src.repository import users as repository_users
 from src.services.users import auth_service
-
 
 router = APIRouter(prefix='/users', tags=["users"])
 
@@ -25,7 +25,6 @@ async def signup(body: UserModel, db: Session = Depends(get_db)):
     return {"user": new_user, "detail": "User successfully created"}
 
 
-
 @router.post("/login", response_model=TokenModel)
 async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = await repository_users.get_user_by_email(body.username, db)
@@ -38,7 +37,6 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
     await repository_users.update_token(user, refresh_token, db)
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
-
 
 
 @router.get('/refresh_token', response_model=TokenModel)
@@ -63,7 +61,7 @@ async def get_users(db: Session = Depends(get_db)):
 
 
 @router.get("/secret")
-async def read_item(current_user: UserDb = Depends(auth_service.get_current_user)):
+async def read_item(current_user: User = Depends(auth_service.get_current_user)):
     """
     function for testing working authorisations
     """

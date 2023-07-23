@@ -10,14 +10,12 @@ class UserModel(BaseModel):
     role: str = Field()
 
 
-
 class UserDb(BaseModel):
     id: int
     username: str
     email: EmailStr
     created_at: datetime
     # avatar: str
-
 
     class Config:
         orm_mode = True
@@ -63,10 +61,3 @@ class TokenModel(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
-
-
-class CommentModel(BaseModel):
-    comment: str = Field(min_length=1, max_length=255)
-    user_id: int = Field(1, gt=0)
-    image_id: int = Field(1, gt=0)
-
