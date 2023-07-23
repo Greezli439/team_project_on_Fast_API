@@ -9,8 +9,7 @@ from src.database.models import Image, User
 
 from src.repository import users as repository_users
 
-from src.schemas import UserModel, UserResponse, TokenModel, ImageBase, ImageResponse, CommentResponse, CommentModel, \
-    CommentDeleteResponse
+from src.schemas import UserModel, UserResponse, TokenModel, CommentResponse, CommentModel, CommentDeleteResponse
 from src.repository import comments as repository_comments
 
 # from src.services.auth import auth_service
