@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic import BaseModel, Field
 from fastapi import File
-
+from src.database.models import Role
 
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=16)
@@ -29,6 +29,24 @@ class UserDb(BaseModel):
 class UserResponse(BaseModel):
     username: UserDb
     detail: str = "User successfully created"
+
+
+class UserBan(BaseModel):
+    user_id: int
+    banned: bool = True
+
+
+class UserChangeRole(BaseModel):
+    user_id: int
+    role: Role
+
+
+class UserDBBanned(UserDb):
+    banned: bool
+
+
+class UserDBRole(UserDb):
+    role: Role
 
 ####################################TAG###############################
 class TagModel(BaseModel):

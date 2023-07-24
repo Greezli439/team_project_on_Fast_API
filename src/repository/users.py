@@ -31,3 +31,19 @@ async def create_user(body: UserModel, db: Session) -> User:
 async def update_token(user: User, token: str | None, db: Session) -> None:
     user.refresh_token = token
     db.commit()
+
+async def ban_user(body, db):
+    banned_user = db.query(User).filter(User.id == body.user_id).first()
+    if banned_user:
+        banned_user.banned = True
+        db.commit()
+        db.refresh(banned_user)
+    return banned_user
+
+async def change_user_role(body, db):
+    user = db.query(User).filter(User.id == body.user_id).first()
+    if user:
+        user.role = body.role
+        db.commit()
+        db.refresh(user)
+    return user
