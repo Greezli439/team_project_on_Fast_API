@@ -69,9 +69,7 @@ class CommentResponse(BaseModel):
 
 
 class CommentModel(BaseModel):
-    id: int
     comment: str = Field(min_length=1, max_length=255)
-    user_id: int = Field(1, gt=0)
     image_id: int = Field(1, gt=0)
 
 ######################################IMAGE#############################

@@ -28,7 +28,7 @@ class Image(Base):
 
     url = Column(String(255), nullable=False)
     title = Column(String(50), nullable=False)
-    description = Column(String(150), nullable=False)
+    description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     # comments = relationship(List('comments'))
     username = relationship('User', backref="images")
@@ -75,7 +75,6 @@ class User(Base):
     # logout_token = Column(String(255))
     # confirmed = Column(Boolean, default=False)
     banned = Column(Boolean, default=False)
-    # role = relationship('users_roles')
     role = Column('role', Enum(Role), default=Role.user)
 
 

@@ -1,6 +1,5 @@
 import logging
 
-from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
 from src.database.models import User
@@ -23,15 +22,6 @@ async def create_user(body: UserModel, db: Session) -> User:
     new_user = User(**body.dict())
     if not users.first():
         new_user.role = 'admin'
-        
-    avatar = ''
-    try:
-        g = Gravatar(body.email)
-        avatar = g.get_image()
-    except Exception as e:
-        logging.error(e)
-
-    # new_user = User(**body.dict(), avatar=avatar)
     
     db.add(new_user)
     db.commit()
