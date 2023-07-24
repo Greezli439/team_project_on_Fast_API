@@ -24,8 +24,7 @@ class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     SECRET_KEY = os.environ.get('SECRET_KEY')
     ALGORITHM = os.environ.get('ALGORITHM')
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-    # r = redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
 
     def verify_password(self, plain_password, hashed_password):
         return self.pwd_context.verify(plain_password, hashed_password)
@@ -92,15 +91,9 @@ class Auth:
         except JWTError as e:
             raise credentials_exception
 
-        user = self.r.get(f"user:{email}")
+        user = await repository_users.get_user_by_email(email, db)
         if user is None:
-            user = await repository_users.get_user_by_email(email, db)
-            if user is None:
-                raise credentials_exception
-            self.r.set(f"user:{email}", pickle.dumps(user))
-            self.r.expire(f"user:{email}", 900)
-        else:
-            user = pickle.loads(user)
+            raise credentials_exception
         return user
 
     async def get_email_from_token(self, token: str):

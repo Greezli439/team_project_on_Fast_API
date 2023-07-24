@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.database.models import Comment, Image
+from src.database.models import Comment, Image, User
 from src.schemas import CommentModel
 
 
@@ -16,8 +16,8 @@ async def get_comment_by_id(comment_id: int, db: Session):
     return db.query(Comment).filter_by(id=comment_id).first()
 
 
-async def create_comment(body: CommentModel, db: Session):
-    comment = Comment(**body.dict())
+async def create_comment(body: CommentModel, current_user: User, db: Session):
+    comment = Comment(**body.dict(), user_id=current_user.id)
     db.add(comment)
     db.commit()
     return comment

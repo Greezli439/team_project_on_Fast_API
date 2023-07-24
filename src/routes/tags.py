@@ -3,10 +3,12 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends, status, Security, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
+from src.services.users import auth_service
 
 from src.database.db_connection import get_db
 from src.schemas import UserModel, UserResponse, TokenModel, TagResponse, TagModel
 from src.repository import tags as repository_tags
+from src.services.roles import access_AM, access_AU, access_A
 
 # from src.services.auth import auth_service
 
