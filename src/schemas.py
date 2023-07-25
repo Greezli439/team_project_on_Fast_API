@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from fastapi import File
 from src.database.models import Role
 
+
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=16)
     email: str
@@ -48,6 +49,7 @@ class UserDBBanned(UserDb):
 class UserDBRole(UserDb):
     role: Role
 
+
 ####################################TAG###############################
 class TagModel(BaseModel):
     name_tag: str = Field(max_length=25)
@@ -60,11 +62,13 @@ class TagResponse(TagModel):
     class Config:
         orm_mode = True
 
+
 #################################TOKEN###############################
 class TokenModel(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
 
 #################################COMMENT####################################
 class CommentDeleteResponse(BaseModel):
@@ -89,6 +93,8 @@ class CommentResponse(BaseModel):
 class CommentModel(BaseModel):
     comment: str = Field(min_length=1, max_length=255)
     image_id: int = Field(1, gt=0)
+    user_id: int = Field(1, gt=0)
+
 
 ######################################IMAGE#############################
 class ImageAddModel(BaseModel):
