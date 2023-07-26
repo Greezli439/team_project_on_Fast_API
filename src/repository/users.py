@@ -35,7 +35,7 @@ async def update_token(user: User, token: str | None, db: Session) -> None:
 async def ban_user(body, db):
     banned_user = db.query(User).filter(User.id == body.user_id).first()
     if banned_user:
-        banned_user.banned = True
+        banned_user.banned = body.banned
         db.commit()
         db.refresh(banned_user)
     return banned_user
