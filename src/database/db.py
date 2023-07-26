@@ -84,7 +84,4 @@ class User(Base):
     role = Column('role', Enum(Role), default=Role.user)
 
 
-# class Role(Base):
-#     __tablename__ = 'users_roles'
-#     id = Column(Integer, primary_key=True)
-#     role_name = Column(String(30), nullable=False, unique=True)
+

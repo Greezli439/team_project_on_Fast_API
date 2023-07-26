@@ -1,6 +1,6 @@
 import logging
 
-from libgravatar import Gravatar
+# from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
 from src.database.models import User
@@ -10,6 +10,10 @@ from src.schemas import UserModel
 async def get_users(db: Session):
     users = db.query(User)
     return users
+
+
+async def get_user_by_name(username: str, db: Session) -> User | None:
+    return db.query(User).filter(User.username == username).first()
 
 async def get_user_by_email(email: str, db: Session) -> User | None:
     return db.query(User).filter(User.email == email).first()
@@ -26,11 +30,11 @@ async def create_user(body: UserModel, db: Session) -> User:
         new_user = User(**body.dict())
         
     avatar = ''
-    try:
-        g = Gravatar(body.email)
-        avatar = g.get_image()
-    except Exception as e:
-        logging.error(e)
+    # try:
+    #     g = Gravatar(body.email)
+    #     avatar = g.get_image()
+    # except Exception as e:
+    #     logging.error(e)
 
     # new_user = User(**body.dict(), avatar=avatar)
     

@@ -45,7 +45,6 @@ class Comment(Base):
     edit_date = Column(DateTime)
 
 class Role(enum.Enum):
-    # __tablename__ = 'users_roles'
     admin: str = 'admin'
     moderator: str = 'moderator'
     user: str = 'user'
@@ -67,7 +66,8 @@ class User(Base):
     role = Column('role', Enum(Role), default=Role.user)
 
 
-# class Role(Base):
-#     __tablename__ = 'users_roles'
-#     id = Column(Integer, primary_key=True)
-#     role_name = Column(String(30), nullable=False, unique=True)
+class TokenData(Base):
+    __tablename__ = "token_black_list"
+    access_token = Column(String(255), primary_key=True)
+    created_at = Column('created_at', DateTime, default=func.now())
+   

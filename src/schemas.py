@@ -3,6 +3,8 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, EmailStr
 from fastapi import File
 
+from src.database.models import Role
+
 class UserModel(BaseModel):
     username: str = Field(min_length=3, max_length=16)
     email: EmailStr
@@ -15,7 +17,7 @@ class UserDb(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
-    # avatar: str
+    role: Role
 
     class Config:
         orm_mode = True
@@ -27,7 +29,7 @@ class UserResponse(BaseModel):
 
 
 class TagModel(BaseModel):
-    name: str = Field(max_length=25)
+    name_tag: str = Field(max_length=25)
 
 
 class TagResponse(TagModel):

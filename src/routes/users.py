@@ -1,14 +1,19 @@
+from fastapi import APIRouter, Depends, Header
 from typing import List
+from jose import JWTError, jwt
 
 from fastapi import APIRouter, HTTPException, Depends, status, Security
-from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from typing_extensions import Annotated
 
 from src.database.db_connection import get_db
-from src.database.models import User, Role
-from src.schemas import UserModel, UserDb, UserResponse, TokenModel
+from src.database.models import User, Role, TokenData, Tag
+from src.schemas import UserModel, UserDb, UserResponse, TokenModel, CommentsResponce
 from src.repository import users as repository_users
-from src.services.users import auth_service
+from src.services.users import auth_service, is_token_blacklisted
+from src.services.roles import RolesAccess
 
 router = APIRouter(prefix='/users', tags=["users"])
 
@@ -60,9 +65,27 @@ async def get_users(db: Session = Depends(get_db)):
     return users.all()
 
 
-@router.get("/secret")
-async def read_item(current_user: User = Depends(auth_service.get_current_user)):
-    """
-    function for testing working authorisations
-    """
-    return {"message": 'secret router', "user": current_user.email}
+@router.get("/me/", response_model=UserDb)
+async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
+    return current_user
+
+
+@router.get("/{username}", response_model=UserDb)
+async def get_user(username: str, db: Session = Depends(get_db)):
+    user = await repository_users.get_user_by_name(username, db)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Not found!")
+    return user
+
+
+@router.post("/logout/")
+async def logout(token_data: TokenData = Depends(auth_service.oauth2_scheme), db: Session = Depends(get_db)):
+    # Додаємо access token до чорного списку
+    tok_data = TokenData(access_token=token_data)
+    db.add(tok_data)
+    db.commit()
+    db.refresh(tok_data)
+    # повертаємо підтвердження про вихід зі системи
+    return JSONResponse(content={"message": "Successfully logged out"})
+

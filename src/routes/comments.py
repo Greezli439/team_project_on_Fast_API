@@ -47,10 +47,3 @@ async def remove_images_comments_for_id(image_id: int,
     pass
 
 
-@router.get('/test_role/', response_model=CommentsResponce,
-               dependencies=[Depends(RolesAccess([Role.admin, Role.moderator]))])
-async def remove_images_comments_for_id(db: Session = Depends(get_db),
-                                        current_user: User = Depends(
-                                            auth_service.get_current_user)
-                                        ):
-    return CommentsResponce(comment = 'Hello', username = current_user.username, edit_date = str(current_user.created_at))

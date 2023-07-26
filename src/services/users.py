@@ -1,9 +1,6 @@
 import pickle
 
-# import redis
-
 from typing import Optional
-
 from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -12,8 +9,8 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from src.database.db_connection import get_db
+from src.database.models import User, TokenData
 from src.repository import users as repository_users
-# from src.conf.config import settings
 from dotenv import load_dotenv
 import os
 
@@ -72,25 +69,17 @@ class Auth:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail='Could not validate credentials')
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User|None:
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-        try:
-            # Decode JWT
-            payload = jwt.decode(token, self.SECRET_KEY,
-                                 algorithms=[self.ALGORITHM])
-            if payload['scope'] == 'access_token':
-                email = payload["sub"]
-                if email is None:
-                    raise credentials_exception
-            else:
-                raise credentials_exception
-        except JWTError as e:
-            raise credentials_exception
+        if await is_token_blacklisted(token, db):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        email = await self.get_email_from_token(token)
 
         user = await repository_users.get_user_by_email(email, db)
         if user is None:
@@ -110,3 +99,15 @@ class Auth:
 
 
 auth_service = Auth()
+
+
+async def is_token_blacklisted(token: str, db: Session = Depends(get_db)) -> bool:
+    """
+    Перевірка, чи токен міститься в чорному списку
+    """
+
+    blacklisted_tokens = [i.access_token for i in db.query(TokenData).all()]
+    if blacklisted_tokens:
+        if token in blacklisted_tokens:
+            return True
+    return False
