@@ -14,7 +14,6 @@ from src.repository import users as repository_users
 from src.schemas import UserModel, UserResponse, TokenModel, CommentResponse, CommentModel, CommentDeleteResponse
 from src.repository import comments as repository_comments
 
-# from src.services.users import auth_service
 
 router = APIRouter(prefix='/comments', tags=["comments"])
 
@@ -24,14 +23,12 @@ security = HTTPBearer()
 
 @router.get('/', response_model=List[CommentResponse], dependencies=[Depends(access_A)])
 async def get_comments(db: Session = Depends(get_db)):
-    print(111111)
     comments = await repository_comments.get_comments(db)
     return comments
 
 @router.get('/{image_id}', response_model=List[CommentResponse])
 async def get_comment_by_image_id(image_id: int = Path(ge=1), db: Session = Depends(get_db)):
     comment = await repository_comments.get_comments_for_photo(image_id, db)
-    print(comment, '*'*80)
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such comment")
     return comment

@@ -1,9 +1,10 @@
-
 import uvicorn
+
+from threading import Thread
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from src.services.db_cleaner import clean_engine
 from src.routes import users, tags, comments, images
 
 app = FastAPI()
@@ -25,6 +26,9 @@ app.add_middleware(
 def read_root():
     return {"message": "Hello Team"}
 
+
+thread = Thread(target=clean_engine)
+thread.start()
 
 if __name__ == '__main__':
     uvicorn.run('main:app', port=8000, reload=True)
