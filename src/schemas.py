@@ -70,6 +70,10 @@ class TokenModel(BaseModel):
     token_type: str = "bearer"
 
 
+class TokenData(BaseModel):
+    access_token: str
+    token_type: str
+
 #################################COMMENT####################################
 class CommentDeleteResponse(BaseModel):
     id: int = 1
@@ -79,7 +83,6 @@ class CommentDeleteResponse(BaseModel):
         orm_mode = True
 
 
-#
 class CommentResponse(BaseModel):
     id: int = 1
     comment: str

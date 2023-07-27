@@ -1,10 +1,14 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends, status, Security
-from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import APIRouter, HTTPException, Depends, status, Security, Header
+from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from jose import JWTError, jwt
+from typing_extensions import Annotated
 
 from src.database.db_connection import get_db
+from src.database.models import User, Role, Token, Tag
 from src.schemas import UserModel, UserDb, UserResponse, TokenModel, UserBase, \
     UserDBBanned, UserBan, UserChangeRole, UserDBRole
 from src.repository import users as repository_users
@@ -58,6 +62,12 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
+@router.post("/logout/")
+async def logout(token_data: Token = Depends(auth_service.oauth2_scheme), db: Session = Depends(get_db)):
+    await auth_service.add_token_to_blacklist(token_data, db)
+    return JSONResponse(content={"message": "Successfully logged out"})
+
+
 @router.get('/refresh_token', response_model=TokenModel)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
     token = credentials.credentials
@@ -79,3 +89,15 @@ async def get_users(db: Session = Depends(get_db)):
     return users.all()
 
 
+@router.get("/me/", response_model=UserDb)
+async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
+    return current_user
+
+
+@router.get("/{username}", response_model=UserDb)
+async def get_user(username: str, db: Session = Depends(get_db)):
+    user = await repository_users.get_user_by_username(username, db)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Not found!")
+    return user
