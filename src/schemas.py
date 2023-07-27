@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from fastapi import File
 from src.database.models import Role
 
+
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=16)
     email: str
@@ -48,6 +49,7 @@ class UserDBBanned(UserDb):
 class UserDBRole(UserDb):
     role: Role
 
+
 ####################################TAG###############################
 class TagModel(BaseModel):
     name_tag: str = Field(max_length=25)
@@ -60,6 +62,7 @@ class TagResponse(TagModel):
     class Config:
         orm_mode = True
 
+
 #################################TOKEN###############################
 class TokenModel(BaseModel):
     access_token: str
@@ -70,6 +73,7 @@ class TokenModel(BaseModel):
 class TokenData(BaseModel):
     access_token: str
     token_type: str
+
 #################################COMMENT####################################
 class CommentDeleteResponse(BaseModel):
     id: int = 1
@@ -92,6 +96,8 @@ class CommentResponse(BaseModel):
 class CommentModel(BaseModel):
     comment: str = Field(min_length=1, max_length=255)
     image_id: int = Field(1, gt=0)
+    user_id: int = Field(1, gt=0)
+
 
 ######################################IMAGE#############################
 class ImageAddModel(BaseModel):
@@ -110,6 +116,7 @@ class ImageUpdateModel(BaseModel):
 class ImageDb(BaseModel):
     id: int
     url: str
+    title: str
     description: str
     tags: List[TagResponse]
     user_id: int
@@ -123,6 +130,33 @@ class ImageDb(BaseModel):
 class ImageGetResponse(BaseModel):
     image: ImageDb
     comments: List[CommentResponse]
+
+class ImageChangeSizeModel(BaseModel):
+    title: str
+    height: int 
+    width: int
+    description: str
+    tags: Optional[List[str]]
+
+
+class ImageChangeColorModel(BaseModel):
+    title: str
+    object: str 
+    color: str
+    description: str
+    tags: Optional[List[str]]
+
+class ImageTransformModel(BaseModel):
+    title: str
+    description: str
+    tags: Optional[List[str]]
+
+class ImageSignModel(BaseModel):
+    title: str
+    text: str
+    description: str
+    tags: Optional[List[str]]
+
 
 
 class ImageGetAllResponse(BaseModel):
