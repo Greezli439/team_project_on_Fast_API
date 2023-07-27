@@ -40,7 +40,7 @@ async def add_image(db: Session, tags: list[str], url: str, title: str, descript
     for tag in tags:
         if len(tag) > 25:
             tag = tag[0:25]
-        if not db.query(Tag).filter(Tag.name == tag.lower()).first():
+        if not db.query(Tag).filter(Tag.name_tag == tag.lower()).first():
             db_tag = Tag(name_tag=tag.lower())
             db.add(db_tag)
             db.commit()
