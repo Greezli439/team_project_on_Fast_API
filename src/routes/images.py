@@ -68,7 +68,7 @@ async def delete_image(id: int, db: Session = Depends(get_db)):
 async def change_size_image(body: ImageChangeSizeModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.change_size_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.change_size_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -78,7 +78,7 @@ async def change_size_image(body: ImageChangeSizeModel,
 async def change_size_image(body: ImageChangeColorModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.change_color_object_in_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.change_color_object_in_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -88,7 +88,7 @@ async def change_size_image(body: ImageChangeColorModel,
 async def cut_face_in_image(body: ImageTransformModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.cut_face_in_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.cut_face_in_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -98,7 +98,7 @@ async def cut_face_in_image(body: ImageTransformModel,
 async def sign_image(body: ImageSignModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.cut_face_in_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.cut_face_in_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -107,7 +107,7 @@ async def sign_image(body: ImageSignModel,
 async def expand_image(body: ImageTransformModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.expand_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.expand_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -116,7 +116,7 @@ async def expand_image(body: ImageTransformModel,
 async def vertically_expand_image(body: ImageTransformModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.vertically_expand_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.vertically_expand_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -125,7 +125,7 @@ async def vertically_expand_image(body: ImageTransformModel,
 async def fade_adges_image(body: ImageTransformModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.fade_adges_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.fade_adges_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
@@ -134,7 +134,7 @@ async def fade_adges_image(body: ImageTransformModel,
 async def make_black_white_image(body: ImageTransformModel, 
                             db: Session = Depends(get_db), 
                             current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.make_black_white_image(body=body, db=db, useer = current_user)
+    db_image, detail = await repository_images.make_black_white_image(body=body, db=db, user = current_user)
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}

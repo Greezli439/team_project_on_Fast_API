@@ -2,6 +2,7 @@ import pickle
 
 # import redis
 import cloudinary
+import cloudinary.uploader
 
 from typing import Optional
 
@@ -10,7 +11,7 @@ from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from sqlalchemy.orm import Session
 
 from src.database.db_connection import get_db
@@ -49,7 +50,7 @@ class Img:
     >>> new_name = create_new_name(original_name)
     >>> print(f"New name with timestamp: {new_name}")
     """
-        return f"{name}\n{str(datetime.now().ctime())}"
+        return f"{name}{str(datetime.now().second)}"
     
     async def add_image(self, content, title: str) -> str:
         """
