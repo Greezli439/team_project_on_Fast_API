@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-
+from src.database.models import User, Token
 from src.database.db_connection import get_db
 from src.repository import users as repository_users
 # from src.conf.config import settings
@@ -71,12 +71,26 @@ class Auth:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail='Could not validate credentials')
 
+    async def is_token_blacklisted(self, token: str, db: Session = Depends(get_db)) -> bool:
+        """
+        Перевірка, чи токен міститься в чорному списку
+        """
+
+        blacklisted_tokens = [i.access_token for i in db.query(Token).all()]
+        if blacklisted_tokens:
+            if token in blacklisted_tokens:
+                return True
+        return False
+
     async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+        if await self.is_token_blacklisted(token, db):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
         try:
             # Decode JWT
@@ -96,24 +110,13 @@ class Auth:
             raise credentials_exception
         return user
 
-    async def get_email_from_token(self, token: str):
-        try:
-            payload = jwt.decode(token, self.SECRET_KEY,
-                                 algorithms=[self.ALGORITHM])
-            email = payload["sub"]
-            return email
-        except JWTError as e:
-            print(e)
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                                detail="Invalid token for email verification")
 
-    def create_email_token(self, data: dict):
-        to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(days=1)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire})
-        token = jwt.encode(to_encode, self.SECRET_KEY,
-                           algorithm=self.ALGORITHM)
-        return token
+    async def add_token_to_blacklist(self, access_token, db):
+        tok_data = Token(access_token=access_token)
+        db.add(tok_data)
+        db.commit()
+        db.refresh(tok_data)
+
 
 
 auth_service = Auth()
