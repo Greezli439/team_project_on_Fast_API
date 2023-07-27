@@ -27,7 +27,7 @@ class Image(Base):
     id = Column(Integer, primary_key=True)
 
     url = Column(String(255), nullable=False)
-    title = Column(String(50), nullable=False)
+    title = Column(String(150), nullable=False)
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     # comments = relationship(List('comments'))

@@ -89,6 +89,7 @@ class ImageUpdateModel(BaseModel):
 class ImageDb(BaseModel):
     id: int
     url: str
+    title: str
     description: str
     tags: List[TagResponse]
     user_id: int
@@ -102,6 +103,33 @@ class ImageDb(BaseModel):
 class ImageGetResponse(BaseModel):
     image: ImageDb
     comments: List[CommentResponse]
+
+class ImageChangeSizeModel(BaseModel):
+    title: str
+    height: int 
+    width: int
+    description: str
+    tags: Optional[List[str]]
+
+
+class ImageChangeColorModel(BaseModel):
+    title: str
+    object: str 
+    color: str
+    description: str
+    tags: Optional[List[str]]
+
+class ImageTransformModel(BaseModel):
+    title: str
+    description: str
+    tags: Optional[List[str]]
+
+class ImageSignModel(BaseModel):
+    title: str
+    text: str
+    description: str
+    tags: Optional[List[str]]
+
 
 
 class ImageGetAllResponse(BaseModel):
