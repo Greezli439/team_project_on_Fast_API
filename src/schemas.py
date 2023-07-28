@@ -1,27 +1,31 @@
 from datetime import datetime
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
+
 from fastapi import File
 from src.database.models import Role
 
 
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=16)
-    email: str
+    email: EmailStr
     password: str = Field(min_length=6, max_length=16)
 
 
 class UserModel(UserBase):
-    role: str = Field()
+    role: Role = Field()
 
+class UserUpdate(BaseModel):
+    username: str = Field(min_length=3, max_length=16)
+    role : Role
+    information: str
+   
 
 class UserDb(BaseModel):
     id: int
-    username: str = "Jack"
-    email: str = "jacck@jack.com"
+    username: str
+    email: EmailStr
     created_at: datetime
-
-    # avatar: str
 
     class Config:
         orm_mode = True
@@ -58,6 +62,7 @@ class TagModel(BaseModel):
 class TagResponse(TagModel):
     id: int
     name_tag: str
+
 
     class Config:
         orm_mode = True
@@ -170,7 +175,6 @@ class ImageAddResponse(BaseModel):
     class Config:
         orm_mode = True
 
-    
 
 class ImageAddTagResponse(BaseModel):
     id: int
@@ -179,14 +183,12 @@ class ImageAddTagResponse(BaseModel):
 
     class Config:
         orm_mode = True
- 
+
 
 class ImageDeleteResponse(BaseModel):
     image: ImageDb
     detail: str = "Image has been deleted"
 
-#PUT
-######################################IMAGE#############################
 
 class ImageUpdateDescrResponse(BaseModel):
     id: int
@@ -209,3 +211,6 @@ class ImageNameUpdateResponse(BaseModel):
 
 class ImageUpdateModel(BaseModel):
     description: str = Field(max_length=500)
+
+######################################IMAGE#############################
+
