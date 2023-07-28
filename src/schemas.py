@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional, Union
 from pydantic import BaseModel, Field
-from fastapi import File
+from fastapi import File, Path
 from src.database.models import Role
 
 
@@ -96,8 +96,10 @@ class CommentResponse(BaseModel):
 class CommentModel(BaseModel):
     comment: str = Field(min_length=1, max_length=255)
     image_id: int = Field(1, gt=0)
-    user_id: int = Field(1, gt=0)
 
+class CommentModelUpdate(BaseModel):
+    comment: str = Field(min_length=1, max_length=255)
+    comment_id: int = Path(ge=1)
 
 ######################################IMAGE#############################
 class ImageAddModel(BaseModel):

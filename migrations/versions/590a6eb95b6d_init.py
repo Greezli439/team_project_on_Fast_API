@@ -1,8 +1,8 @@
 """Init
 
-Revision ID: 513ecc3dab80
+Revision ID: 590a6eb95b6d
 Revises: 
-Create Date: 2023-07-24 16:08:29.172919
+Create Date: 2023-07-28 13:09:10.386959
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '513ecc3dab80'
+revision = '590a6eb95b6d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,6 +24,11 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name_tag')
     )
+    op.create_table('token_black_list',
+    sa.Column('access_token', sa.String(length=255), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('access_token')
+    )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=30), nullable=False),
@@ -32,6 +37,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('refresh_token', sa.String(length=255), nullable=True),
     sa.Column('banned', sa.Boolean(), nullable=True),
+    sa.Column('role', sa.Enum('admin', 'moderator', 'user', name='role'), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -39,8 +45,8 @@ def upgrade() -> None:
     op.create_table('images',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('url', sa.String(length=255), nullable=False),
-    sa.Column('title', sa.String(length=50), nullable=False),
-    sa.Column('description', sa.String(length=150), nullable=False),
+    sa.Column('title', sa.String(length=150), nullable=False),
+    sa.Column('description', sa.String(length=150), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -75,5 +81,6 @@ def downgrade() -> None:
     op.drop_table('comments')
     op.drop_table('images')
     op.drop_table('users')
+    op.drop_table('token_black_list')
     op.drop_table('tags')
     # ### end Alembic commands ###

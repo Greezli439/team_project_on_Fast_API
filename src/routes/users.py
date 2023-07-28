@@ -36,14 +36,14 @@ async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/signup", response_model=UserDBRole, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserBase, db: Session = Depends(get_db)):
     exist_user = await repository_users.get_user_by_email(body.email, db)
     if exist_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, db)
-    return { "detail": "User successfully created"}
+    return new_user
 
 
 @router.post("/login", response_model=TokenModel)

@@ -42,7 +42,7 @@ async def get_image(id: int, db: Session = Depends(get_db)):
     return {"image": user_image, "comments": comments}
 
 
-##########Тут має бути завантаження на Cloudinary
+
 @router.post('/', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
 async def create_new_images(file: UploadFile = File(),
                             title: str = None,
@@ -54,7 +54,9 @@ async def create_new_images(file: UploadFile = File(),
     contents =  await file.read()
     url = await image_cloudinary.add_image(contents, title)
     tags_list = [tag for tag in tags.split(',')]
-    db_image, detail = await repository_images.add_image(db=db, url=url, tags=tags_list, title=title, description=description, user=current_user)
+    db_image, detail = await repository_images.add_image(db=db, url=url, tags=tags_list,
+                                                         title=title, description=description,
+                                                         user=current_user)
     return {"image": db_image, "details": detail}
 
 
