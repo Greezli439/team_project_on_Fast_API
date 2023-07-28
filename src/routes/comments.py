@@ -59,7 +59,7 @@ async def create_comment(body: CommentModel, db: Session = Depends(get_db),
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such image")
     body.user_id = current_user.id
-    comment = await repository_comments.create_comment(body, db)
+    comment = await repository_comments.create_comment(body,current_user, db)
     return comment
 
 
