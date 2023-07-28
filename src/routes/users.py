@@ -11,6 +11,7 @@ from src.database.db_connection import get_db
 from src.database.models import User, Role, Token, Tag
 from src.schemas import UserModel, UserDb, UserResponse, UserUpdate, \
     TokenModel, UserBase, UserDBBanned, UserBan, UserChangeRole, UserDBRole
+
 from src.repository import users as repository_users
 from src.services.users import auth_service
 from src.services.roles import access_AM, access_AU, access_A
@@ -18,6 +19,22 @@ from src.services.roles import access_AM, access_AU, access_A
 router = APIRouter(prefix='/users', tags=["users"])
 
 security = HTTPBearer()
+
+@router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
+              status_code=status.HTTP_202_ACCEPTED)
+async def ban_user(body: UserBan, db: Session = Depends(get_db)):
+    banned_user = await repository_users.ban_user(body, db)
+    if not banned_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
+    return banned_user
+
+@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
+              status_code=status.HTTP_202_ACCEPTED)
+async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
+    user = await repository_users.change_user_role(body, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
+    return user
 
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -27,8 +44,8 @@ async def signup(body: UserBase, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, db)
-    return {"user": new_user, "detail": "User successfully created"}
-    # return JSONResponse(content={"detail": "User successfully created"})
+
+    return { "detail": "User successfully created"}
 
 
 @router.post("/login", response_model=TokenModel)
@@ -104,7 +121,6 @@ async def get_user(username: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Not found!")
     return user
-
 
 @router.put("/me", response_model=UserDb)
 async def update_user(body: UserUpdate, db: Session = Depends(get_db),

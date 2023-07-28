@@ -15,6 +15,13 @@ app.include_router(images.router, prefix='/api')
 app.include_router(comments.router, prefix='/api')
 app.include_router(tags.router, prefix='/api')
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_middleware(
     CORSMiddleware,
