@@ -53,7 +53,9 @@ async def create_new_images(file: UploadFile = File(),
     file.filename = f"{uuid.uuid4()}.jpg"
     contents =  await file.read()
     url = await image_cloudinary.add_image(contents, title)
-    tags_list = [tag for tag in tags.split(',')]
+    tags_list = []
+    if tags:
+        tags_list = [tag.strip() for tag in tags.replace(',', ' ').split(' ') if tag.strip() != '']
     db_image, detail = await repository_images.add_image(db=db, url=url, tags=tags_list, title=title, description=description, user=current_user)
     return {"image": db_image, "details": detail}
 
