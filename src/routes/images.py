@@ -27,15 +27,30 @@ security = HTTPBearer()
 @router.get("/{image_id}", response_model=ImageGetResponse)
 async def get_image(image_id: int, db: Session = Depends(get_db),
                     current_user: User = Depends(auth_service.get_current_user)):
-    url = await repository_images.get_image(db, image_id)
-    return {'url': url}
+    response = await repository_images.get_image(db, image_id, current_user)
+    return response
 
 
 @router.get("", response_model=ImageGetAllResponse)
-async def get_images(db: Session = Depends(get_db),
+async def get_users_images(db: Session = Depends(get_db),
                      current_user: User = Depends(auth_service.get_current_user)):
-    urls = await repository_images.get_images(db)
-    return {'urls': urls}
+    images_response = await repository_images.get_users_images(db, current_user)
+    return {'images_response': images_response}
+
+
+@router.get("", response_model=ImageGetAllResponse)
+async def get_all_images(db: Session = Depends(get_db),
+                     current_user: User = Depends(auth_service.get_current_user)):
+    images_response = await repository_images.get_all_images(db)
+    return {'images_response': images_response}
+
+
+@router.get("/{tag_id}", response_model=ImageGetAllResponse)
+async def get_image_by_tag(tag_id: int, db: Session = Depends(get_db),
+                    current_user: User = Depends(auth_service.get_current_user)):
+    response = await repository_images.get_images_by_tag(tag_id, db, current_user)
+    return response
+
 
 @router.put('/{comment_id}', response_model=ImageNameUpdateResponse)
 async def update_image(body: ImageNameUpdateModel, db: Session = Depends(get_db),
@@ -66,8 +81,9 @@ async def create_new_images(file: UploadFile = File(),
 
 
 @router.delete("/{id}", response_model=ImageDeleteResponse, dependencies=[Depends(access_AU)])
-async def delete_image(id: int, db: Session = Depends(get_db)):
-    db_image = await repository_images.delete_image(db, id)
+async def delete_image(id: int, db: Session = Depends(get_db), 
+                       current_user: User = Depends(auth_service.get_current_user)):
+    db_image = await repository_images.delete_image(db, id, current_user)
     return {"image": db_image, "details": "Image was successfully deleted"}
 
 

@@ -114,9 +114,6 @@ class ImageAddTagModel(BaseModel):
     tags: Optional[List[str]]
 
 
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
-
 
 class ImageDb(BaseModel):
     id: int
@@ -133,8 +130,7 @@ class ImageDb(BaseModel):
         exclude = {'updated_at', 'user', 'title'}
 
 
-class ImageGetResponse(BaseModel):
-    url: str
+
 
 
 class ImageChangeSizeModel(BaseModel):
@@ -156,10 +152,21 @@ class ImageSignModel(BaseModel):
     id: int
     text: str
 
+#GET
+######################################IMAGE#############################
+class ImageGetResponse(BaseModel):
+    url: str
+    description: str
+    tags_list: list[TagResponse]
+    comments_list: list[CommentResponse]
+
 
 class ImageGetAllResponse(BaseModel):
-    urls: List[str]
+    images_response: list[ImageGetResponse]
 
+
+
+######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
     image: ImageDb
@@ -201,4 +208,9 @@ class ImageNameUpdateModel(BaseModel):
 class ImageNameUpdateResponse(BaseModel):
     image: ImageDb
     detail: str = "Image has been added"
+
+class ImageUpdateModel(BaseModel):
+    description: str = Field(max_length=500)
+
 ######################################IMAGE#############################
+
