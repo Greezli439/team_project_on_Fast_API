@@ -10,6 +10,7 @@ from src.services.users import auth_service
 from src.database.db_connection import get_db
 from src.database.models import User
 from src.schemas import ImageGetAllResponse, ImageNameUpdateModel, ImageNameUpdateResponse, \
+
     ImageGetResponse, ImageAddTagResponse, ImageSignModel, ImageAddResponse, ImageDeleteResponse, ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel
 from src.repository import users as repository_users
 from src.repository import images as repository_images
@@ -17,12 +18,10 @@ from src.services.roles import access_AM, access_AU, access_A
 from src.services.images import image_cloudinary
 from src.services.users import auth_service
 
-# from src.services.auth import auth_service
 
 router = APIRouter(prefix='/images', tags=["images"])
 
 security = HTTPBearer()
-
 
 
 @router.get("/{image_id}", response_model=ImageGetResponse)
@@ -138,6 +137,7 @@ async def fade_adges_image(body: ImageTransformModel,
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
 
+
 @router.post('/black_white', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
 async def make_black_white_image(body: ImageTransformModel, 
                             db: Session = Depends(get_db), 
@@ -146,4 +146,3 @@ async def make_black_white_image(body: ImageTransformModel,
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
-

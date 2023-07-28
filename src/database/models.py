@@ -2,7 +2,7 @@
 # from enum import Enum
 import enum
 
-from sqlalchemy import Column, Integer, String, Boolean, func, Table, Enum
+from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
@@ -69,19 +69,16 @@ class User(Base):
     email = Column(String(100), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     # images = relationship(List('images'))
-    # avatar = relationship('images', backref="users")
     created_at = Column('created_at', DateTime, default=func.now())
     refresh_token = Column(String(255))
-    # logout_token = Column(String(255))
-    # confirmed = Column(Boolean, default=False)
     banned = Column(Boolean, default=False)
     role = Column('role', Enum(Role), default=Role.user)
+    information = Column(String, nullable=True)
+    number_of_images = Column(Integer, nullable=True)
+    average_rating = Column(Float, nullable=True)
 
 
 class Token(Base):
     __tablename__ = "token_black_list"
     access_token = Column(String(255), primary_key=True)
     created_at = Column('created_at', DateTime, default=func.now())
-
-
-

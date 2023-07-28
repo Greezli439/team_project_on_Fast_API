@@ -32,6 +32,7 @@ class Img:
         secure=True
     )
 
+
     def create_new_name(self):
         return f"{str(datetime.now().time())}"
     

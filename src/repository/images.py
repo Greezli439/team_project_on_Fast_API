@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 from src.database.models import Image, User, Tag, Comment, Role
 from src.repository import tags
 from src.routes import images
+
 from src.schemas import ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel, ImageSignModel, ImageUpdateModel
 from src.services.images import image_cloudinary
 
 
 async def get_images(db: Session):
     images = db.query(Image).order_by(Image.id).all()
-
     urls = []
     for image in images:
         urls.append(image.url)
@@ -39,7 +39,6 @@ async def add_image(db: Session, tags: list[str], url: str, image_name: str, pub
     detail = "Image was successfully created"
     num_tags = 0
     image_tags = []
-
     for tag in tags:
         if len(tag) > 25:
             tag = tag[0:25]
@@ -126,7 +125,6 @@ async def vertically_expand_image(body: ImageTransformModel, db: Session, user: 
     db_tags = db_image.tags
     tags = [tag.name_tag for tag in db_tags]
     return await add_image(db=db, tags=tags, url=url, image_name=new_image_name, public_id=public_id, description=db_image.description,user=user)
-
 
 
 async def fade_adges_image(body: ImageTransformModel, db: Session, user: User):
