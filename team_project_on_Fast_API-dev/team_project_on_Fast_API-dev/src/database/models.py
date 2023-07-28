@@ -27,16 +27,14 @@ class Image(Base):
     id = Column(Integer, primary_key=True)
 
     url = Column(String(255), nullable=False)
-    title = Column(String(50), nullable=False)
-    description = Column(String(150), nullable=False)
-    user_id = Column('user_id', ForeignKey(
-        'users.id', ondelete='CASCADE'), default=None)
+    title = Column(String(150), nullable=False)
+    description = Column(String(150))
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     # comments = relationship(List('comments'))
-    user = relationship('User', backref="images")
+    username = relationship('User', backref="images")
     tags = relationship("Tag", secondary=image_m2m_tag, backref="images")
     created_at = Column("created_at", DateTime, default=func.now())
-    updated_at = Column("updated_at", DateTime,
-                        default=func.now(), onupdate=func.now())
+    updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
 
 class Tag(Base):
@@ -49,24 +47,21 @@ class Comment(Base):
     __tablename__ = "comments"
     id = Column(Integer, primary_key=True)
     comment = Column(String(255), nullable=False)
-    user_id = Column("user_id", ForeignKey(
-        'users.id', ondelete='CASCADE'), default=None)
-    user = relationship("User", backref="comments")
-    image_id = Column("image_id", ForeignKey(
-        "image.id", ondelete="CASCADE"), default=None)
-    image = relationship("Image", backref="comments")
+    user_id = Column("user_id", ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    username = relationship("User", backref="comments")
+    image_id = Column("image_id", ForeignKey("images.id", ondelete="CASCADE"), default=None)
+    # image = relationship("Image", backref="comments")
     created_at = Column("created_at", DateTime, default=func.now())
-    updated_at = Column("updated_at", DateTime,
-                        default=func.now(), onupdate=func.now())
+    updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
-
+    
 class Role(enum.Enum):
     __tablename__ = 'users_roles'
     admin: str = 'admin'
     moderator: str = 'moderator'
     user: str = 'user'
 
-
+      
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -78,10 +73,15 @@ class User(Base):
     created_at = Column('created_at', DateTime, default=func.now())
     refresh_token = Column(String(255))
     # logout_token = Column(String(255))
-    confirmed = Column(Boolean, default=False)
+    # confirmed = Column(Boolean, default=False)
     banned = Column(Boolean, default=False)
-    # role = relationship('users_roles')
     role = Column('role', Enum(Role), default=Role.user)
+
+
+class Token(Base):
+    __tablename__ = "token_black_list"
+    access_token = Column(String(255), primary_key=True)
+    created_at = Column('created_at', DateTime, default=func.now())
 
 
 
