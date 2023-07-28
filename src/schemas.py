@@ -1,27 +1,33 @@
 from datetime import datetime
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, Field, EmailStr
+
 from fastapi import File, Path
+
 from src.database.models import Role
 
 
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=16)
-    email: str
+    email: EmailStr
     password: str = Field(min_length=6, max_length=16)
 
 
 class UserModel(UserBase):
-    role: str = Field()
+    role: Role = Field()
 
+class UserUpdate(BaseModel):
+    username: str = Field(min_length=3, max_length=16)
+    role : Role
+    information: str
+   
 
 class UserDb(BaseModel):
     id: int
-    username: str = "Jack"
-    email: str = "jacck@jack.com"
+    username: str
+    email: EmailStr
     created_at: datetime
-
-    # avatar: str
 
     class Config:
         orm_mode = True
@@ -58,6 +64,7 @@ class TagModel(BaseModel):
 class TagResponse(TagModel):
     id: int
     name_tag: str
+
 
     class Config:
         orm_mode = True
@@ -111,14 +118,12 @@ class ImageAddTagModel(BaseModel):
     tags: Optional[List[str]]
 
 
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
-
 
 class ImageDb(BaseModel):
     id: int
     url: str
-    title: str
+    public_id: str
+    image_name: str
     description: str
     tags: List[TagResponse]
     user_id: int
@@ -129,41 +134,43 @@ class ImageDb(BaseModel):
         exclude = {'updated_at', 'user', 'title'}
 
 
-class ImageGetResponse(BaseModel):
-    image: ImageDb
-    comments: List[CommentResponse]
+
+
 
 class ImageChangeSizeModel(BaseModel):
-    title: str
-    height: int 
-    width: int
-    description: str
-    tags: Optional[List[str]]
-
+    id: int
+    width: int = 200
+    
 
 class ImageChangeColorModel(BaseModel):
-    title: str
+    id: int
     object: str 
     color: str
-    description: str
-    tags: Optional[List[str]]
+
 
 class ImageTransformModel(BaseModel):
-    title: str
-    description: str
-    tags: Optional[List[str]]
+    id: int
+
 
 class ImageSignModel(BaseModel):
-    title: str
+    id: int
     text: str
-    description: str
-    tags: Optional[List[str]]
 
+#GET
+######################################IMAGE#############################
+class ImageGetResponse(BaseModel):
+    url: str
+    description: str
+    tags_list: list[TagResponse]
+    comments_list: list[CommentResponse]
 
 
 class ImageGetAllResponse(BaseModel):
-    images: List[ImageGetResponse]
+    images_response: list[ImageGetResponse]
 
+
+
+######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
     image: ImageDb
@@ -182,6 +189,11 @@ class ImageAddTagResponse(BaseModel):
         orm_mode = True
 
 
+class ImageDeleteResponse(BaseModel):
+    image: ImageDb
+    detail: str = "Image has been deleted"
+
+
 class ImageUpdateDescrResponse(BaseModel):
     id: int
     description: str
@@ -191,6 +203,18 @@ class ImageUpdateDescrResponse(BaseModel):
         orm_mode = True
 
 
-class ImageDeleteResponse(BaseModel):
+class ImageUpdateModel(BaseModel):
+    description: str = Field(max_length=500)
+
+class ImageNameUpdateModel(BaseModel):
+    image_name: str
+
+class ImageNameUpdateResponse(BaseModel):
     image: ImageDb
-    detail: str = "Image has been deleted"
+    detail: str = "Image has been added"
+
+class ImageUpdateModel(BaseModel):
+    description: str = Field(max_length=500)
+
+######################################IMAGE#############################
+

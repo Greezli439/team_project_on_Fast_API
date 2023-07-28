@@ -64,13 +64,7 @@ async def get_comment_by_image_id(image_id: int = Path(ge=1), db: Session = Depe
 @router.put('/{comment_id}', response_model=CommentResponse)
 async def update_comment(body: CommentModelUpdate, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
-    # if current_user.id != body.user_id and current_user.role == 'user':
-    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't change not your comment")
-
     comment = await repository_comments.update_comment(body, db, current_user)
-
-    # if not comment:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such comment")
     return comment
 
 

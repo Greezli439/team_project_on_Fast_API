@@ -23,6 +23,8 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 bcrypt = "^4.0.1"
 schedule = "^1.2.0"
 cloudinary = "^1.33.0"
+pydantic = {extras = ["email"], version = "^2.1.1"}
+
 
 
 [tool.poetry.group.dev.dependencies]
