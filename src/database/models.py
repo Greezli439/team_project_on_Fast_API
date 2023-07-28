@@ -25,9 +25,9 @@ image_m2m_tag = Table(
 class Image(Base):
     __tablename__ = "images"
     id = Column(Integer, primary_key=True)
-
     url = Column(String(255), nullable=False)
-    title = Column(String(150), nullable=False)
+    public_id = Column(String(150))
+    image_name = Column(String(150))
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     # comments = relationship(List('comments'))
