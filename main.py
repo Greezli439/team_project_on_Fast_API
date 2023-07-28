@@ -36,8 +36,8 @@ def read_root():
     return {"message": "Hello Team"}
 
 
-thread = Thread(target=clean_engine)
-thread.start()
+# thread = Thread(target=clean_engine)
+# thread.start()
 
 if __name__ == '__main__':
     uvicorn.run('main:app', port=8000, reload=True)
