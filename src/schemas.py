@@ -119,6 +119,8 @@ class ImageAddTagModel(BaseModel):
 
 class ImageUpdateModel(BaseModel):
     image_name: str
+    description: str
+    tags: str
 
 
 class ImageModel(BaseModel):
@@ -216,8 +218,7 @@ class ImageNameUpdateResponse(BaseModel):
     image: ImageModel
     detail: str = "Image has been added"
 
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
+
 
 ######################################IMAGE#############################
 

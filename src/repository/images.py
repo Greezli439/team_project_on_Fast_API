@@ -49,6 +49,8 @@ async def img_update(body:ImageUpdateModel, image_id: int, db: Session, user: Us
         and_(Image.id == image_id, Image.user_id == user.id)).first()
     if image:
         image.image_name = body.image_name
+        image.description = body.description
+        image.tags = body.tags
         db.commit()
     return image
 
