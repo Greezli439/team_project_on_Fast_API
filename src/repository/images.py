@@ -1,3 +1,4 @@
+import qrcode
 from datetime import datetime
 
 from fastapi import HTTPException, status
@@ -187,3 +188,13 @@ async def make_black_white_image (body: ImageTransformModel, db: Session, user: 
     db_tags = db_image.tags
     tags = [tag.name_tag for tag in db_tags]
     return await add_image(db=db, tags=tags, url=url, image_name=new_image_name, public_id=public_id, description=db_image.description,user=user)
+
+
+async def get_qr_code(id: int, db: Session):
+    db_image = db.query(Image).filter(Image.id == id).first()
+    print('8'*80)
+    print(db_image.url)
+    qr = qrcode.make(db_image.url)
+    print('4' * 80)
+    print(type(qr))
+    qr.save("qr_code.png")
