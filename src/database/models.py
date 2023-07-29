@@ -1,5 +1,6 @@
 
-# from enum import Enum
+from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum
+from enum import Enum
 import enum
 
 from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum
