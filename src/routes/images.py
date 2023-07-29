@@ -10,8 +10,8 @@ from src.services.users import auth_service
 from src.database.db_connection import get_db
 from src.database.models import User
 from src.schemas import ImageGetAllResponse, ImageNameUpdateModel, ImageNameUpdateResponse, \
-
-    ImageGetResponse, ImageAddTagResponse, ImageSignModel, ImageAddResponse, ImageDeleteResponse, ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel
+    ImageGetResponse, ImageAddTagResponse, ImageSignModel, ImageAddResponse, ImageDeleteResponse, \
+    ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel
 from src.repository import users as repository_users
 from src.repository import images as repository_images
 from src.services.roles import access_AM, access_AU, access_A
@@ -31,7 +31,7 @@ async def get_image(image_id: int, db: Session = Depends(get_db),
     return response
 
 
-@router.get("", response_model=ImageGetAllResponse)
+@router.get("", response_model=List[ImageGetResponse])
 async def get_users_images(db: Session = Depends(get_db),
                      current_user: User = Depends(auth_service.get_current_user)):
     images_response = await repository_images.get_users_images(db, current_user)

@@ -1,8 +1,8 @@
 """Init
 
-Revision ID: 590a6eb95b6d
+Revision ID: dc1144ff13f9
 Revises: 
-Create Date: 2023-07-28 13:09:10.386959
+Create Date: 2023-07-29 01:27:29.615398
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '590a6eb95b6d'
+revision = 'dc1144ff13f9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,6 +38,9 @@ def upgrade() -> None:
     sa.Column('refresh_token', sa.String(length=255), nullable=True),
     sa.Column('banned', sa.Boolean(), nullable=True),
     sa.Column('role', sa.Enum('admin', 'moderator', 'user', name='role'), nullable=True),
+    sa.Column('information', sa.String(), nullable=True),
+    sa.Column('number_of_images', sa.Integer(), nullable=True),
+    sa.Column('average_rating', sa.Float(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -45,7 +48,8 @@ def upgrade() -> None:
     op.create_table('images',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('url', sa.String(length=255), nullable=False),
-    sa.Column('title', sa.String(length=150), nullable=False),
+    sa.Column('public_id', sa.String(length=150), nullable=True),
+    sa.Column('image_name', sa.String(length=150), nullable=True),
     sa.Column('description', sa.String(length=150), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
