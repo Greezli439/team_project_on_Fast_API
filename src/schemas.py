@@ -17,7 +17,6 @@ class UserModel(UserBase):
 
 class UserUpdate(BaseModel):
     username: str = Field(min_length=3, max_length=16)
-    role : Role
     information: str
    
 
@@ -26,6 +25,7 @@ class UserDb(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
+    role: Role = Field()
 
     class Config:
         orm_mode = True
