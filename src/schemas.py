@@ -117,15 +117,18 @@ class ImageAddModel(BaseModel):
 class ImageAddTagModel(BaseModel):
     tags: Optional[List[str]]
 
+class ImageUpdateModel(BaseModel):
+    image_name: str
 
 
-class ImageDb(BaseModel):
+class ImageModel(BaseModel):
     id: int
     url: str
     public_id: str
     image_name: str
     description: str
     tags: List[TagResponse]
+    comments: List[CommentResponse]
     user_id: int
     created_at: datetime
 
@@ -173,7 +176,7 @@ class ImageGetAllResponse(BaseModel):
 ######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
-    image: ImageDb
+    image: ImageModel
     detail: str = "Image has been added"
 
     class Config:
@@ -190,7 +193,7 @@ class ImageAddTagResponse(BaseModel):
 
 
 class ImageDeleteResponse(BaseModel):
-    image: ImageDb
+    image: ImageModel
     detail: str = "Image has been deleted"
 
 
@@ -210,7 +213,7 @@ class ImageNameUpdateModel(BaseModel):
     image_name: str
 
 class ImageNameUpdateResponse(BaseModel):
-    image: ImageDb
+    image: ImageModel
     detail: str = "Image has been added"
 
 class ImageUpdateModel(BaseModel):
