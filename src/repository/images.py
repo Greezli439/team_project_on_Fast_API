@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 
 from src.database.models import Image, User, Tag, Comment, Role
 from src.repository import tags
@@ -11,25 +12,62 @@ from src.schemas import ImageChangeSizeModel, ImageChangeColorModel, ImageTransf
 from src.services.images import image_cloudinary
 
 
-async def get_images(db: Session):
+async def get_users_images(db: Session, user: User):
+    response = []
+    user_images = user.images
+    user_img_id_list = [img.id for img in user_images]
     images = db.query(Image).order_by(Image.id).all()
-    urls = []
     for image in images:
-        urls.append(image.url)
-    return urls
+        if image.id in user_img_id_list:
+            # db_tags = image.tags
+            # tags_list = [tag.name_tag for tag in db_tags]
+            # recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
+            # comments_list = [comment.comment for comment in recent_comments]
+            result = {'url': image.url, 'description': image.description}
+            response.append(result)
+    print(response)
+    return {"images_response": response}
 
 
-async def get_image(db: Session, id: int):
+async def get_all_images(db: Session):
+    response = []
+    images = db.query(Image).order_by(Image.id).all()
+    for image in images:
+        db_tags = image.tags
+        tags_list = [tag.name_tag for tag in db_tags]
+        recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
+        comments_list = [comment.comment for comment in recent_comments]
+        result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
+        response.append(result)
+    return {"images_response": response}
+
+
+async def get_image(db: Session, id: int, user: User):
     image = db.query(Image).filter(Image.id == id).first()
     if image:
-        return image.url 
+        return image
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
 
+async def get_images_by_tag(tag_id: int, db: Session, user: User):
+    response = []
+    user_images = user.images
+    user_img_list = [img for img in user_images]
+    images = db.query(Image).filter(Image.id == tag_id).all()
+    for image in images:
+        if image in user_img_list:
+            db_tags = image.tags
+            tags_list = [tag.name_tag for tag in db_tags]
+            recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
+            comments_list = [comment.comment for comment in recent_comments]
+            result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
+            response.append(result)
+    return {"images_response": response}
+    
+
 async def img_update_name(body:ImageUpdateModel, db: Session, user: User):
     pass
-
 
 
 async def add_image(db: Session, tags: list[str], url: str, image_name: str, public_id: str, description: str, user: User):
@@ -62,7 +100,7 @@ async def add_image(db: Session, tags: list[str], url: str, image_name: str, pub
     return db_image, detail
 
 
-async def delete_image(db: Session, id: int):
+async def delete_image(db: Session, id: int, user: User):
     db_image = db.query(Image).filter(Image.id == id).first()
     await image_cloudinary.delete_image(db_image.public_id)
     db.delete(db_image)

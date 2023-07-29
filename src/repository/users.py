@@ -17,7 +17,6 @@ async def get_user_by_username(username: str, db: Session) -> User | None:
     return db.query(User).filter(User.username == username).first()
 
 async def create_user(body: UserModel, db: Session) -> User:
-    
     users = await get_users(db)
     new_user = User(**body.dict())
     if not users.first():

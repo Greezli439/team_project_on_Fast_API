@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import List, Optional, Union
+
 from pydantic import BaseModel, Field, EmailStr
 
-from fastapi import File
+from fastapi import File, Path
+
 from src.database.models import Role
 
 
@@ -101,8 +103,10 @@ class CommentResponse(BaseModel):
 class CommentModel(BaseModel):
     comment: str = Field(min_length=1, max_length=255)
     image_id: int = Field(1, gt=0)
-    user_id: int = Field(1, gt=0)
 
+class CommentModelUpdate(BaseModel):
+    comment: str = Field(min_length=1, max_length=255)
+    comment_id: int = Path(ge=1)
 
 ######################################IMAGE#############################
 class ImageAddModel(BaseModel):
@@ -113,9 +117,6 @@ class ImageAddModel(BaseModel):
 class ImageAddTagModel(BaseModel):
     tags: Optional[List[str]]
 
-
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
 
 
 class ImageDb(BaseModel):
@@ -133,8 +134,7 @@ class ImageDb(BaseModel):
         exclude = {'updated_at', 'user', 'title'}
 
 
-class ImageGetResponse(BaseModel):
-    url: str
+
 
 
 class ImageChangeSizeModel(BaseModel):
@@ -156,10 +156,21 @@ class ImageSignModel(BaseModel):
     id: int
     text: str
 
+#GET
+######################################IMAGE#############################
+class ImageGetResponse(BaseModel):
+    url: str
+    description: str
+    tags: List[TagResponse]
+    comments: List[CommentResponse]
+
 
 class ImageGetAllResponse(BaseModel):
-    urls: List[str]
+    images_response: List[ImageGetResponse]
 
+
+
+######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
     image: ImageDb
@@ -201,4 +212,9 @@ class ImageNameUpdateModel(BaseModel):
 class ImageNameUpdateResponse(BaseModel):
     image: ImageDb
     detail: str = "Image has been added"
+
+class ImageUpdateModel(BaseModel):
+    description: str = Field(max_length=500)
+
 ######################################IMAGE#############################
+

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from src.database.models import Comment, Image, User
 from src.schemas import CommentModel
-
+from fastapi import HTTPException, status
 
 async def get_comments(db: Session):
     return db.query(Comment).all()
@@ -23,13 +23,16 @@ async def create_comment(body: CommentModel, current_user: User, db: Session):
     return comment
 
 
-async def update_comment(body: CommentModel, comment_id, db: Session):
-    comment = await get_comment_by_id(comment_id, db)
-    if comment:
+async def update_comment(body: CommentModel, db: Session, current_user: User):
+    comment = await get_comment_by_id(body.comment_id, db)
+    if not comment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,  detail="No such comment")
+    if comment.user_id == current_user.id or current_user.role in ['moderator', 'admin']:
         comment.comment = body.comment
         db.commit()
-    return comment
-
+        return comment
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't change not your comment")
 
 async def remove_comment(comment_id, db: Session):
     comment = await get_comment_by_id(comment_id, db)
