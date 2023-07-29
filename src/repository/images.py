@@ -19,12 +19,13 @@ async def get_users_images(db: Session, user: User):
     images = db.query(Image).order_by(Image.id).all()
     for image in images:
         if image.id in user_img_id_list:
-            db_tags = image.tags
-            tags_list = [tag.name_tag for tag in db_tags]
-            recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-            comments_list = [comment for comment in recent_comments]
-            result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
+            # db_tags = image.tags
+            # tags_list = [tag.name_tag for tag in db_tags]
+            # recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
+            # comments_list = [comment.comment for comment in recent_comments]
+            result = {'url': image.url, 'description': image.description}
             response.append(result)
+    print(response)
     return {"images_response": response}
 
 
@@ -35,22 +36,16 @@ async def get_all_images(db: Session):
         db_tags = image.tags
         tags_list = [tag.name_tag for tag in db_tags]
         recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-        comments_list = [comment for comment in recent_comments]
+        comments_list = [comment.comment for comment in recent_comments]
         result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
         response.append(result)
     return {"images_response": response}
 
 
 async def get_image(db: Session, id: int, user: User):
-    user_images = user.images
-    user_img_id_list = [img.id for img in user_images]
     image = db.query(Image).filter(Image.id == id).first()
-    if image.id in user_img_id_list:
-        db_tags = image.tags
-        tags_list = [tag.name_tag for tag in db_tags]
-        recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-        comments_list = [comment for comment in recent_comments]
-        return {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
+    if image:
+        return image
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
@@ -65,7 +60,7 @@ async def get_images_by_tag(tag_id: int, db: Session, user: User):
             db_tags = image.tags
             tags_list = [tag.name_tag for tag in db_tags]
             recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-            comments_list = [comment for comment in recent_comments]
+            comments_list = [comment.comment for comment in recent_comments]
             result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
             response.append(result)
     return {"images_response": response}
@@ -73,7 +68,6 @@ async def get_images_by_tag(tag_id: int, db: Session, user: User):
 
 async def img_update_name(body:ImageUpdateModel, db: Session, user: User):
     pass
-
 
 
 async def add_image(db: Session, tags: list[str], url: str, image_name: str, public_id: str, description: str, user: User):

@@ -30,9 +30,9 @@ class Image(Base):
     image_name = Column(String(150))
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    # comments = relationship(List('comments'))
     username = relationship('User', backref="images")
     tags = relationship("Tag", secondary=image_m2m_tag, backref="images")
+    comments = relationship('Comment', backref="images")
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
@@ -50,7 +50,6 @@ class Comment(Base):
     user_id = Column("user_id", ForeignKey('users.id', ondelete='CASCADE'), default=None)
     username = relationship("User", backref="comments")
     image_id = Column("image_id", ForeignKey("images.id", ondelete="CASCADE"), default=None)
-    # image = relationship("Image", backref="comments")
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
@@ -68,7 +67,6 @@ class User(Base):
     username = Column(String(30), nullable=False, unique=True)
     email = Column(String(100), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
-    # images = relationship(List('images'))
     created_at = Column('created_at', DateTime, default=func.now())
     refresh_token = Column(String(255))
     banned = Column(Boolean, default=False)

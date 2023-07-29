@@ -161,12 +161,12 @@ class ImageSignModel(BaseModel):
 class ImageGetResponse(BaseModel):
     url: str
     description: str
-    tags_list: list[TagResponse]
-    comments_list: list[CommentResponse]
+    tags: List[TagResponse]
+    comments: List[CommentResponse]
 
 
 class ImageGetAllResponse(BaseModel):
-    images_response: list[ImageGetResponse]
+    images_response: List[ImageGetResponse]
 
 
 
