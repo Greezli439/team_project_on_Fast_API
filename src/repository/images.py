@@ -48,9 +48,30 @@ async def img_update(body:ImageUpdateModel, image_id: int, db: Session, user: Us
     image = db.query(Image).filter(
         and_(Image.id == image_id, Image.user_id == user.id)).first()
     if image:
+        for old_tag in image.tags:
+            tags.remove_tag(old_tag.id)
+        tags_list = body.tags.replace(",", "").replace(".", "").replace("/", "").split()
+        num_tags = 0
+        image_tags = []
+        for tag in tags_list:
+            if len(tag) > 25:
+                tag = tag[0:25]
+            if not db.query(Tag).filter(Tag.name_tag == tag.lower()).first():
+                db_tag = Tag(name_tag=tag.lower())
+                db.add(db_tag)
+                db.commit()
+                db.refresh(db_tag)
+            if num_tags < 5:
+                image_tags.append(tag.lower())
+            num_tags += 1
+
+        if num_tags >= 5:
+            detail = "Maximum 5 tags per image allowed!"
+
+        tags = db.query(Tag).filter(Tag.name_tag.in_(image_tags)).all()
         image.image_name = body.image_name
         image.description = body.description
-        image.tags = body.tags
+        image.tags = tags # доробити
         db.commit()
     return image
 
