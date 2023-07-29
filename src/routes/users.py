@@ -20,6 +20,7 @@ router = APIRouter(prefix='/users', tags=["users"])
 
 security = HTTPBearer()
 
+
 @router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
               status_code=status.HTTP_202_ACCEPTED)
 async def ban_user(body: UserBan, db: Session = Depends(get_db)):
@@ -27,6 +28,7 @@ async def ban_user(body: UserBan, db: Session = Depends(get_db)):
     if not banned_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
     return banned_user
+
 
 @router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
               status_code=status.HTTP_202_ACCEPTED)
@@ -70,15 +72,6 @@ async def ban_user(body: UserBan, db: Session = Depends(get_db)):
     if not banned_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
     return banned_user
-
-
-@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
-    user = await repository_users.change_user_role(body, db)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return user
 
 
 @router.post("/logout/")

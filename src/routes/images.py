@@ -162,3 +162,10 @@ async def make_black_white_image(body: ImageTransformModel,
     if db_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return {"image": db_image, "details": detail}
+
+
+@router.get('/qrcode/')
+async def get_qr_code(id: int, db: Session = Depends(get_db)):
+    print('$'*80)
+    qr_image = await repository_images.get_qr_code(id, db)
+    return qr_image
