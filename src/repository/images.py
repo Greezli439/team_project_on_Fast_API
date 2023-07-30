@@ -5,15 +5,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc, and_
 
 from src.database.models import Image, User, Tag, Comment, Role
-from src.repository import tags
+from src.repository import tags as t
 from src.routes import images
 
 from src.schemas import ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel, ImageSignModel, ImageUpdateModel
 from src.services.images import image_cloudinary
 
 
-async def get_users_images(db: Session, user: User):
-    images = db.query(Image).filter(Image.user_id == user.id).all()
+async def get_current_user_images(db: Session, user_id, user: User):
+    images = db.query(Image).filter(Image.user_id == user_id).all()
     if images:
         return images
     else:
@@ -39,7 +39,7 @@ async def get_image(db: Session, id: int, user: User):
 async def get_images_by_tag(id: int, db: Session, user: User):
     images = db.query(Image).filter(Image.tags.any(tag_id=id)).all()
     if images:
-        return images
+        return [image for image in images]
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
@@ -49,7 +49,7 @@ async def img_update(body:ImageUpdateModel, image_id: int, db: Session, user: Us
         and_(Image.id == image_id, Image.user_id == user.id)).first()
     if image:
         for old_tag in image.tags:
-            tags.remove_tag(old_tag.id)
+            t.remove_tag(old_tag.id,db)
         tags_list = body.tags.replace(",", "").replace(".", "").replace("/", "").split()
         num_tags = 0
         image_tags = []
