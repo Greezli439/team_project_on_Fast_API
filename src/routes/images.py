@@ -31,18 +31,18 @@ async def get_image(image_id: int, db: Session = Depends(get_db),
     return response
 
 
-@router.get("", response_model=List[ImageGetResponse])
-async def get_users_images(db: Session = Depends(get_db),
+@router.get("/{user_id}", response_model=List[ImageGetResponse])
+async def get_current_user_images(user_id: int, db: Session = Depends(get_db),
                      current_user: User = Depends(auth_service.get_current_user)):
-    images_response = await repository_images.get_users_images(db, current_user)
-    return {'images_response': images_response}
+    images_response = await repository_images.get_current_user_images(db, user_id, current_user)
+    return images_response
 
 
-@router.get("", response_model=ImageGetAllResponse)
+@router.get("/", response_model=List[ImageGetResponse])
 async def get_all_images(db: Session = Depends(get_db),
                      current_user: User = Depends(auth_service.get_current_user)):
-    images_response = await repository_images.get_all_images(db)
-    return {'images_response': images_response}
+    images = await repository_images.get_all_images(db)
+    return images
 
 
 @router.get("/{tag_id}", response_model=ImageGetAllResponse)
