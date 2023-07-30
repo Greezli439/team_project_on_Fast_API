@@ -10,7 +10,7 @@ from typing_extensions import Annotated
 from src.database.db_connection import get_db
 from src.database.models import User, Role, Token, Tag
 from src.schemas import UserModel, UserDb, UserResponse, UserUpdate, \
-    TokenModel, UserBase, UserDBBanned, UserBan, UserChangeRole, UserDBRole
+    TokenModel, UserBase, UserDBBanned, UserBan, UserChangeRole, UserDBRole, UserImages
 
 from src.repository import users as repository_users
 from src.services.users import auth_service
@@ -21,6 +21,7 @@ router = APIRouter(prefix='/users', tags=["users"])
 security = HTTPBearer()
 
 
+
 @router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
               status_code=status.HTTP_202_ACCEPTED)
 async def ban_user(body: UserBan, db: Session = Depends(get_db)):
@@ -28,7 +29,6 @@ async def ban_user(body: UserBan, db: Session = Depends(get_db)):
     if not banned_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
     return banned_user
-
 
 
 @router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
@@ -69,16 +69,16 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
+@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
               status_code=status.HTTP_202_ACCEPTED)
-async def ban_user(body: UserBan, db: Session = Depends(get_db)):
-    banned_user = await repository_users.ban_user(body, db)
-    if not banned_user:
+async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
+    user = await repository_users.change_user_role(body, db)
+    if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return banned_user
+    return user
 
 
-@router.post("/logout/")
+@router.post("/logout")
 async def logout(token_data: Token = Depends(auth_service.oauth2_scheme), db: Session = Depends(get_db)):
     await auth_service.add_token_to_blacklist(token_data, db)
     return JSONResponse(content={"message": "Successfully logged out"})
@@ -105,12 +105,13 @@ async def get_users(db: Session = Depends(get_db)):
     return users.all()
 
 
-@router.get("/me/", response_model=UserDb)
-async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
-    return current_user
+@router.get("/me/", response_model=UserImages)
+async def read_users_me(current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
+    user = await repository_users.get_user_by_username(current_user.username, db)
+    return user
 
 
-@router.get("/{username}", response_model=UserDb)
+@router.get("/{username}", response_model=UserImages)
 async def get_user(username: str, db: Session = Depends(get_db)):
     user = await repository_users.get_user_by_username(username, db)
     if user is None:

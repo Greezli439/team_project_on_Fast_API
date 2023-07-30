@@ -34,13 +34,6 @@ async def create_comment(body: CommentModel, db: Session = Depends(get_db),
     comment = await repository_comments.create_comment(body, current_user, db)
     return comment
 
-@router.get('/{image_id}', response_model=List[CommentResponse])
-async def get_comment_by_image_id(image_id: int = Path(ge=1), db: Session = Depends(get_db)):
-    comment = await repository_comments.get_comments_for_photo(image_id, db)
-    if not comment:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such comment")
-    return comment
-
 
 @router.get('/{comment_id}', response_model=CommentResponse)
 async def get_comment_by_id(comment_id: int = Path(ge=1), db: Session = Depends(get_db),
@@ -51,7 +44,7 @@ async def get_comment_by_id(comment_id: int = Path(ge=1), db: Session = Depends(
     return comment
 
 
-@router.get('/{image_id}', response_model=List[CommentResponse])
+@router.get('/image/{image_id}', response_model=List[CommentResponse])
 async def get_comment_by_image_id(image_id: int = Path(ge=1), db: Session = Depends(get_db),
                                   _: User = Depends(auth_service.get_current_user)):
     comment = await repository_comments.get_comments_for_photo(image_id, db)

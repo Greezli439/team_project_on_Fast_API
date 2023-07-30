@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, and_
 
+
 import base64
 import io
 from PIL import Image
@@ -17,7 +18,7 @@ from src.schemas import ImageChangeSizeModel, ImageChangeColorModel, ImageTransf
 from src.services.images import image_cloudinary
 
 
-async def get_current_user_images(db: Session, user_id, user: User):
+async def get_current_user_images(db: Session, user_id: int, user: User):
     images = db.query(Image).filter(Image.user_id == user_id).all()
     if images:
         return images
@@ -40,6 +41,7 @@ async def get_image(db: Session, id: int, user: User):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
+
 
 async def get_images_by_tag(id: int, db: Session):
     images = db.query(Image).join(Image.tags).filter(Tag.id == id).all()
