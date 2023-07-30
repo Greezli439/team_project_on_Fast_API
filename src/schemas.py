@@ -28,10 +28,13 @@ class UserDb(BaseModel):
     email: EmailStr
     created_at: datetime
     role: Role = Field()
-
+    
     class Config:
         orm_mode = True
 
+class UserImages(UserDb):
+    number_of_images: int = 0
+    
 
 class UserResponse(BaseModel):
     username: UserDb
