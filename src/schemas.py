@@ -176,6 +176,11 @@ class ImageGetAllResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class GetQRCode(BaseModel):
+    id: int
+    base64_encoded_img: str
+
+
 ######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
