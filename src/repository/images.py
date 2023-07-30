@@ -41,8 +41,8 @@ async def get_image(db: Session, id: int, user: User):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
 
-async def get_images_by_tag(id: int, db: Session, user: User):
-    images = db.query(Image).filter(Image.tags.any(tag_id=id)).all()
+async def get_images_by_tag(id: int, db: Session):
+    images = db.query(Image).join(Image.tags).filter(Tag.id == id).all()
     if images:
         return [image for image in images]
     else:

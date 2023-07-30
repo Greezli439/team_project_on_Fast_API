@@ -11,7 +11,8 @@ from src.database.db_connection import get_db
 from src.database.models import User
 from src.schemas import ImageGetAllResponse, ImageNameUpdateModel, ImageNameUpdateResponse, \
     ImageGetResponse, ImageAddTagResponse, ImageSignModel, ImageAddResponse, ImageDeleteResponse, \
-    ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel, GetQRCode
+    ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel, GetQRCode, \
+    ImageModel, ImageUpdateModel
 
 from src.repository import users as repository_users
 from src.repository import images as repository_images
@@ -46,10 +47,9 @@ async def get_all_images(db: Session = Depends(get_db),
     return images
 
 
-@router.get("/{tag_id}", response_model=ImageGetAllResponse)
-async def get_image_by_tag(tag_id: int, db: Session = Depends(get_db),
-                    current_user: User = Depends(auth_service.get_current_user)):
-    response = await repository_images.get_images_by_tag(tag_id, db, current_user)
+@router.get("/image_by_tag/{tag_id}", response_model=List[ImageGetResponse])
+async def get_image_by_tag(tag_id: int, db: Session = Depends(get_db)):
+    response = await repository_images.get_images_by_tag(tag_id, db)
     return response
 
 
