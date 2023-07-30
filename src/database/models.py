@@ -31,7 +31,7 @@ class Image(Base):
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     username = relationship('User', backref="images")
-    tags = relationship("Tag", secondary=image_m2m_tag, backref="images")
+    tags = relationship("Tag", secondary=image_m2m_tag, back_populates="images")
     comments = relationship('Comment', backref="images")
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
@@ -41,6 +41,7 @@ class Tag(Base):
     __tablename__ = "tags"
     id = Column(Integer, primary_key=True)
     name_tag = Column(String(25), nullable=False, unique=True)
+    images = relationship("Image", secondary=image_m2m_tag, back_populates="tags")
 
 
 class Comment(Base):
