@@ -10,10 +10,9 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from src.database.models import User, Token
+from src.database.models import User, Token, Image
 from src.database.db_connection import get_db
 from src.repository import users as repository_users
-# from src.conf.config import settings
 from dotenv import load_dotenv
 import os
 
@@ -118,5 +117,13 @@ class Auth:
         db.refresh(tok_data)
 
 
-
 auth_service = Auth()
+
+
+async def number_of_images_per_user(db: Session, user_id: int):
+    images = db.query(Image).filter(Image.user_id == user_id).all()
+    if images:
+        number_of_images = len(images)
+    else:
+        number_of_images = 0
+    return number_of_images
