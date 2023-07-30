@@ -2,7 +2,7 @@ from datetime import datetime
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 
 from src.database.models import Image, User, Tag, Comment, Role
 from src.repository import tags
@@ -13,33 +13,19 @@ from src.services.images import image_cloudinary
 
 
 async def get_users_images(db: Session, user: User):
-    response = []
-    user_images = user.images
-    user_img_id_list = [img.id for img in user_images]
-    images = db.query(Image).order_by(Image.id).all()
-    for image in images:
-        if image.id in user_img_id_list:
-            # db_tags = image.tags
-            # tags_list = [tag.name_tag for tag in db_tags]
-            # recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-            # comments_list = [comment.comment for comment in recent_comments]
-            result = {'url': image.url, 'description': image.description}
-            response.append(result)
-    print(response)
-    return {"images_response": response}
+    images = db.query(Image).filter(Image.user_id == user.id).all()
+    if images:
+        return images
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
 
 
 async def get_all_images(db: Session):
-    response = []
     images = db.query(Image).order_by(Image.id).all()
-    for image in images:
-        db_tags = image.tags
-        tags_list = [tag.name_tag for tag in db_tags]
-        recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-        comments_list = [comment.comment for comment in recent_comments]
-        result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
-        response.append(result)
-    return {"images_response": response}
+    if images:
+        return images
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
 
 
 async def get_image(db: Session, id: int, user: User):
@@ -50,24 +36,44 @@ async def get_image(db: Session, id: int, user: User):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
 
-async def get_images_by_tag(tag_id: int, db: Session, user: User):
-    response = []
-    user_images = user.images
-    user_img_list = [img for img in user_images]
-    images = db.query(Image).filter(Image.id == tag_id).all()
-    for image in images:
-        if image in user_img_list:
-            db_tags = image.tags
-            tags_list = [tag.name_tag for tag in db_tags]
-            recent_comments = db.query(Comment).filter_by(image_id=image.id).order_by(desc(Comment.created_at)).limit(3).all()
-            comments_list = [comment.comment for comment in recent_comments]
-            result = {'url': image.url, 'description': image.description, 'tags_list': tags_list, 'comments_list': comments_list}
-            response.append(result)
-    return {"images_response": response}
+async def get_images_by_tag(id: int, db: Session, user: User):
+    images = db.query(Image).filter(Image.tags.any(tag_id=id)).all()
+    if images:
+        return images
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
     
 
-async def img_update_name(body:ImageUpdateModel, db: Session, user: User):
-    pass
+async def img_update(body:ImageUpdateModel, image_id: int, db: Session, user: User):
+    image = db.query(Image).filter(
+        and_(Image.id == image_id, Image.user_id == user.id)).first()
+    if image:
+        for old_tag in image.tags:
+            tags.remove_tag(old_tag.id)
+        tags_list = body.tags.replace(",", "").replace(".", "").replace("/", "").split()
+        num_tags = 0
+        image_tags = []
+        for tag in tags_list:
+            if len(tag) > 25:
+                tag = tag[0:25]
+            if not db.query(Tag).filter(Tag.name_tag == tag.lower()).first():
+                db_tag = Tag(name_tag=tag.lower())
+                db.add(db_tag)
+                db.commit()
+                db.refresh(db_tag)
+            if num_tags < 5:
+                image_tags.append(tag.lower())
+            num_tags += 1
+
+        if num_tags >= 5:
+            detail = "Maximum 5 tags per image allowed!"
+
+        tags = db.query(Tag).filter(Tag.name_tag.in_(image_tags)).all()
+        image.image_name = body.image_name
+        image.description = body.description
+        image.tags = tags # доробити
+        db.commit()
+    return image
 
 
 async def add_image(db: Session, tags: list[str], url: str, image_name: str, public_id: str, description: str, user: User):

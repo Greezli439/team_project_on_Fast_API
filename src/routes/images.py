@@ -10,7 +10,7 @@ from src.services.users import auth_service
 from src.database.db_connection import get_db
 from src.database.models import User
 from src.schemas import ImageGetAllResponse, ImageNameUpdateModel, ImageNameUpdateResponse, \
-    ImageGetResponse, ImageAddTagResponse, ImageSignModel, ImageAddResponse, ImageDeleteResponse, \
+    ImageGetResponse, ImageAddTagResponse, ImageModel, ImageUpdateModel, ImageSignModel, ImageAddResponse, ImageDeleteResponse, \
     ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel
 from src.repository import users as repository_users
 from src.repository import images as repository_images
@@ -52,11 +52,13 @@ async def get_image_by_tag(tag_id: int, db: Session = Depends(get_db),
     return response
 
 
-@router.put('/{comment_id}', response_model=ImageNameUpdateResponse)
-async def update_image(body: ImageNameUpdateModel, db: Session = Depends(get_db),
+@router.put('/{image_id}', response_model=ImageModel)
+async def update_image(body: ImageUpdateModel, image_id:int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.img_update_name(body, db, current_user)
-    return db_image, detail
+    image = await repository_images.img_update(body, image_id, db, current_user)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="contact not found")
+    return image
 
 
 @router.post('/', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
