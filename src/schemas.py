@@ -19,7 +19,6 @@ class UserModel(UserBase):
 
 class UserUpdate(BaseModel):
     username: str = Field(min_length=3, max_length=16)
-    role : Role
     information: str
    
 
@@ -28,6 +27,7 @@ class UserDb(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
+    role: Role = Field()
 
     class Config:
         orm_mode = True
@@ -117,23 +117,26 @@ class ImageAddModel(BaseModel):
 class ImageAddTagModel(BaseModel):
     tags: Optional[List[str]]
 
+class ImageUpdateModel(BaseModel):
+    image_name: str
+    description: str
+    tags: str
 
 
-class ImageDb(BaseModel):
+class ImageModel(BaseModel):
     id: int
     url: str
     public_id: str
     image_name: str
     description: str
     tags: List[TagResponse]
+    comments: List[CommentResponse]
     user_id: int
-    created_at: datetime
+    
 
     class Config:
         orm_mode = True
         exclude = {'updated_at', 'user', 'title'}
-
-
 
 
 
@@ -159,15 +162,19 @@ class ImageSignModel(BaseModel):
 #GET
 ######################################IMAGE#############################
 class ImageGetResponse(BaseModel):
+    id: int
     url: str
     description: str
     tags: List[TagResponse]
     comments: List[CommentResponse]
+    user_id: int
 
 
 class ImageGetAllResponse(BaseModel):
-    images_response: List[ImageGetResponse]
+    images: List[ImageModel]
 
+    class Config:
+        orm_mode = True
 
 class GetQRCode(BaseModel):
     id: int
@@ -177,7 +184,7 @@ class GetQRCode(BaseModel):
 ######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
-    image: ImageDb
+    image: ImageModel
     detail: str = "Image has been added"
 
     class Config:
@@ -194,7 +201,7 @@ class ImageAddTagResponse(BaseModel):
 
 
 class ImageDeleteResponse(BaseModel):
-    image: ImageDb
+    image: ImageModel
     detail: str = "Image has been deleted"
 
 
@@ -207,18 +214,16 @@ class ImageUpdateDescrResponse(BaseModel):
         orm_mode = True
 
 
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
+
 
 class ImageNameUpdateModel(BaseModel):
     image_name: str
 
 class ImageNameUpdateResponse(BaseModel):
-    image: ImageDb
+    image: ImageModel
     detail: str = "Image has been added"
 
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
+
 
 ######################################IMAGE#############################
 

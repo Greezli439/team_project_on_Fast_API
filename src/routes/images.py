@@ -10,7 +10,7 @@ from src.services.users import auth_service
 from src.database.db_connection import get_db
 from src.database.models import User
 from src.schemas import ImageGetAllResponse, ImageNameUpdateModel, ImageNameUpdateResponse, \
-    ImageGetResponse, ImageAddTagResponse, ImageSignModel, ImageAddResponse, ImageDeleteResponse, \
+    ImageGetResponse, ImageAddTagResponse, ImageModel, ImageUpdateModel, ImageSignModel, ImageAddResponse, ImageDeleteResponse, \
     ImageAddModel, ImageChangeSizeModel, ImageChangeColorModel, ImageTransformModel, GetQRCode
 from src.repository import users as repository_users
 from src.repository import images as repository_images
@@ -31,18 +31,18 @@ async def get_image(image_id: int, db: Session = Depends(get_db),
     return response
 
 
-@router.get("", response_model=List[ImageGetResponse])
-async def get_users_images(db: Session = Depends(get_db),
+@router.get("/{user_id}", response_model=List[ImageGetResponse])
+async def get_current_user_images(user_id: int, db: Session = Depends(get_db),
                      current_user: User = Depends(auth_service.get_current_user)):
-    images_response = await repository_images.get_users_images(db, current_user)
-    return {'images_response': images_response}
+    images_response = await repository_images.get_current_user_images(db, user_id, current_user)
+    return images_response
 
 
-@router.get("", response_model=ImageGetAllResponse)
+@router.get("/", response_model=List[ImageGetResponse])
 async def get_all_images(db: Session = Depends(get_db),
                      current_user: User = Depends(auth_service.get_current_user)):
-    images_response = await repository_images.get_all_images(db)
-    return {'images_response': images_response}
+    images = await repository_images.get_all_images(db)
+    return images
 
 
 @router.get("/{tag_id}", response_model=ImageGetAllResponse)
@@ -52,11 +52,13 @@ async def get_image_by_tag(tag_id: int, db: Session = Depends(get_db),
     return response
 
 
-@router.put('/{comment_id}', response_model=ImageNameUpdateResponse)
-async def update_image(body: ImageNameUpdateModel, db: Session = Depends(get_db),
+@router.put('/{image_id}', response_model=ImageModel)
+async def update_image(body: ImageUpdateModel, image_id:int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
-    db_image, detail = await repository_images.img_update_name(body, db, current_user)
-    return db_image, detail
+    image = await repository_images.img_update(body, image_id, db, current_user)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="contact not found")
+    return image
 
 
 @router.post('/', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
@@ -69,7 +71,7 @@ async def create_new_images(file: UploadFile = File(),
     file.filename = f"{uuid.uuid4()}.jpg"
     contents =  await file.read()
     url, public_id = await image_cloudinary.add_image(contents)
-    tags_list = tags.replace(",", "").replace(".", "").replace("/", "").split()
+    tags_list = tags.replace(",", " ").replace(".", " ").replace("/", " ").split()
     db_image, detail = await repository_images.add_image(db=db, 
                                                          url=url, 
                                                          tags=tags_list, 
