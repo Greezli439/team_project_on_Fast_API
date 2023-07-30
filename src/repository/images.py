@@ -204,5 +204,4 @@ async def get_qr_code(id: int, db: Session):
     qr_code_img.save(img_byte_array, format='PNG')
 
     base64_encoded_img = base64.b64encode(img_byte_array.getvalue()).decode('utf-8')
-
     return base64_encoded_img
