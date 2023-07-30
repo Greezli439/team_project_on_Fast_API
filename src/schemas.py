@@ -132,13 +132,11 @@ class ImageModel(BaseModel):
     tags: List[TagResponse]
     comments: List[CommentResponse]
     user_id: int
-    created_at: datetime
+    
 
     class Config:
         orm_mode = True
         exclude = {'updated_at', 'user', 'title'}
-
-
 
 
 
@@ -164,15 +162,19 @@ class ImageSignModel(BaseModel):
 #GET
 ######################################IMAGE#############################
 class ImageGetResponse(BaseModel):
+    id: int
     url: str
     description: str
     tags: List[TagResponse]
     comments: List[CommentResponse]
+    user_id: int
 
 
 class ImageGetAllResponse(BaseModel):
-    images_response: List[ImageGetResponse]
+    images: List[ImageModel]
 
+    class Config:
+        orm_mode = True
 
 
 ######################################IMAGE#############################
@@ -208,8 +210,7 @@ class ImageUpdateDescrResponse(BaseModel):
         orm_mode = True
 
 
-class ImageUpdateModel(BaseModel):
-    description: str = Field(max_length=500)
+
 
 class ImageNameUpdateModel(BaseModel):
     image_name: str
