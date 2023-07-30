@@ -1,8 +1,13 @@
+import qrcode
 from datetime import datetime
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, and_
+
+import base64
+import io
+from PIL import Image
 
 from src.database.models import Image, User, Tag, Comment, Role
 from src.repository import tags as t
@@ -187,3 +192,16 @@ async def make_black_white_image (body: ImageTransformModel, db: Session, user: 
     db_tags = db_image.tags
     tags = [tag.name_tag for tag in db_tags]
     return await add_image(db=db, tags=tags, url=url, image_name=new_image_name, public_id=public_id, description=db_image.description,user=user)
+
+
+async def get_qr_code(id: int, db: Session):
+    db_image = db.query(Image).filter(Image.id == id).first()
+    qr = qrcode.QRCode()
+    qr.add_data(db_image.url)
+    qr.make(fit=True)
+    qr_code_img = qr.make_image(fill_color="black", back_color="white")
+    img_byte_array = io.BytesIO()
+    qr_code_img.save(img_byte_array, format='PNG')
+
+    base64_encoded_img = base64.b64encode(img_byte_array.getvalue()).decode('utf-8')
+    return base64_encoded_img
