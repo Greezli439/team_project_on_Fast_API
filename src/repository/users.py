@@ -49,11 +49,10 @@ async def change_user_role(body, db):
         db.refresh(user)
     return user
 
-# роль юзер сам свою не меняет
+
 async def update(body: UserUpdate, db: Session, current_user: User):
-    # user = await get_user_by_id(user_id, db)new_user = User(**body.dict())
+    
     current_user.username = body.username
-    current_user.role = body.role
     current_user.information = body.information
     db.commit()
     return current_user

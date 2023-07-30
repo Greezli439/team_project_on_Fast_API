@@ -28,17 +28,12 @@ async def ban_user(body: UserBan, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
     return banned_user
 
-@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
-    user = await repository_users.change_user_role(body, db)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return user
-
 
 @router.post("/signup", response_model=UserDBRole, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserBase, db: Session = Depends(get_db)):
+    exist_username = await repository_users.get_user_by_username(body.username, db)
+    if exist_username:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
     exist_user = await repository_users.get_user_by_email(body.email, db)
     if exist_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
@@ -124,6 +119,10 @@ async def get_user(username: str, db: Session = Depends(get_db)):
 @router.put("/me", response_model=UserDb)
 async def update_user(body: UserUpdate, db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
+
+    exist_username = await repository_users.get_user_by_username(body.username, db)
+    if exist_username:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
     user = await repository_users.update(body, db, current_user)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found!")

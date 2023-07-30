@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from src.database.models import Tag
 from src.schemas import TagModel
 
-
 async def get_tags(db: Session):
     return db.query(Tag).all()
 
@@ -34,17 +33,15 @@ async def update_tag(tag_id: int, body: TagModel, db: Session) -> Tag | None:
 
 
 async def remove_tag(tag_id: int, db: Session) -> Tag | None:
-
     tag = db.query(Tag).filter(Tag.id == tag_id).first()
     if tag:
         db.delete(tag)
         db.commit()
     return tag
 
-
-async def remove_tag(tag_id: int, db: Session) -> Tag | None:
-
-    tag = db.query(Tag).filter(Tag.id == tag_id).first()
+ 
+async def remove_name_tag(name_tag: str, db: Session) -> Tag | None:
+    tag = db.query(Tag).filter(Tag.name_tag == name_tag).first()
     if tag:
         db.delete(tag)
         db.commit()
