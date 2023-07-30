@@ -8,6 +8,7 @@ from src.services.users import auth_service
 from src.database.db_connection import get_db
 from src.schemas import UserModel, UserResponse, TokenModel, TagResponse, TagModel
 from src.repository import tags as repository_tags
+from src.repository import work_with_table as repository_test
 from src.services.roles import access_AM, access_AU, access_A
 
 # from src.services.auth import auth_service
@@ -42,7 +43,7 @@ async def create_tag(body: TagModel, db: Session = Depends(get_db)):
     return tag
 
 
-@router.put("/{tag_id}", response_model=TagResponse)
+@router.put("/{tag_id}", response_model=TagResponse, dependencies=[Depends(access_AM)])
 async def update_tag(body: TagModel, tag_id: int, db: Session = Depends(get_db)):
     tag = await repository_tags.update_tag(tag_id, body, db)
     if tag is None:
@@ -51,10 +52,21 @@ async def update_tag(body: TagModel, tag_id: int, db: Session = Depends(get_db))
     return tag
 
 
-@router.delete("/{tag_id}", response_model=TagResponse)
+@router.delete("/{tag_id}", response_model=TagResponse, dependencies=[Depends(access_AM)])
 async def remove_tag(tag_id: int, db: Session = Depends(get_db)):
     tag = await repository_tags.remove_tag(tag_id, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Tag not found or you don't have enough rules to delete")
     return tag
+    
+
+@router.delete("/nametag/{name_tag}", response_model=TagResponse, dependencies=[Depends(access_AM)])
+async def remove_name_tag(name_tag: str, db: Session = Depends(get_db)):
+    print(name_tag)
+    tag = await repository_tags.remove_name_tag(name_tag, db)
+    if tag is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Tag not found or you don't have enough rules to delete")
+    return tag
+
