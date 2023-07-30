@@ -169,6 +169,11 @@ class ImageGetAllResponse(BaseModel):
     images_response: List[ImageGetResponse]
 
 
+class GetQRCode(BaseModel):
+    id: int
+    base64_encoded_img: str
+
+
 ######################################IMAGE#############################
 
 class ImageAddResponse(BaseModel):
