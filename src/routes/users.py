@@ -21,6 +21,25 @@ router = APIRouter(prefix='/users', tags=["users"])
 security = HTTPBearer()
 
 
+
+@router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
+              status_code=status.HTTP_202_ACCEPTED)
+async def ban_user(body: UserBan, db: Session = Depends(get_db)):
+    banned_user = await repository_users.ban_user(body, db)
+    if not banned_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
+    return banned_user
+
+
+@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
+              status_code=status.HTTP_202_ACCEPTED)
+async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
+    user = await repository_users.change_user_role(body, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
+    return user
+
+
 @router.post("/signup", response_model=UserDBRole, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserBase, db: Session = Depends(get_db)):
     exist_username = await repository_users.get_user_by_username(body.username, db)
@@ -48,15 +67,6 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
     await repository_users.update_token(user, refresh_token, db)
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
-
-
-@router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def ban_user(body: UserBan, db: Session = Depends(get_db)):
-    banned_user = await repository_users.ban_user(body, db)
-    if not banned_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return banned_user
 
 
 @router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
