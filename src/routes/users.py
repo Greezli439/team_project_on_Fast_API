@@ -28,14 +28,6 @@ async def ban_user(body: UserBan, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
     return banned_user
 
-@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
-    user = await repository_users.change_user_role(body, db)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return user
-
 
 @router.post("/signup", response_model=UserDBRole, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserBase, db: Session = Depends(get_db)):
