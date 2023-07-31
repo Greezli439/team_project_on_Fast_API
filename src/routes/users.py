@@ -21,7 +21,6 @@ router = APIRouter(prefix='/users', tags=["users"])
 security = HTTPBearer()
 
 
-
 @router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
               status_code=status.HTTP_202_ACCEPTED)
 async def ban_user(body: UserBan, db: Session = Depends(get_db)):
@@ -102,7 +101,7 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
 @router.get("/all_users", response_model=list[UserDb], dependencies=[Depends(access_A)])
 async def get_users(db: Session = Depends(get_db)):
     users = await repository_users.get_users(db)
-    return users.all()
+    return users
 
 
 @router.get("/me/", response_model=UserImages)

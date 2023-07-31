@@ -34,7 +34,7 @@ class UserDb(BaseModel):
 
 class UserImages(UserDb):
     number_of_images: int = 0
-    
+    banned: bool
 
 class UserResponse(BaseModel):
     username: UserDb
@@ -135,7 +135,7 @@ class ImageModel(BaseModel):
     tags: List[TagResponse]
     comments: List[CommentResponse]
     user_id: int
-    
+
 
     class Config:
         orm_mode = True
@@ -170,7 +170,7 @@ class ImageGetResponse(BaseModel):
     description: str
     tags: List[TagResponse]
     comments: List[CommentResponse]
-    user_id: int
+    username: UserDb
 
 
 class ImageGetAllResponse(BaseModel):

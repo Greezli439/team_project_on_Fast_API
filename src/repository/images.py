@@ -27,7 +27,7 @@ async def get_current_user_images(db: Session, user_id: int, user: User):
 
 
 async def get_all_images(db: Session):
-    images = db.query(Image).order_by(Image.id).all()
+    images = db.query(Image).join(Image.username).order_by(Image.id).all()
     if images:
         return images
     else:
@@ -44,7 +44,7 @@ async def get_image(db: Session, id: int, user: User):
 
 
 async def get_images_by_tag(id: int, db: Session):
-    images = db.query(Image).join(Image.tags).filter(Tag.id == id).all()
+    images = db.query(Image).join(Image.tags).join(Image.username).filter(Tag.id == id).all()
     if images:
         return [image for image in images]
     else:

@@ -41,8 +41,7 @@ async def get_current_user_images(user_id: int, db: Session = Depends(get_db),
 
 
 @router.get("/", response_model=List[ImageGetResponse])
-async def get_all_images(db: Session = Depends(get_db),
-                     current_user: User = Depends(auth_service.get_current_user)):
+async def get_all_images(db: Session = Depends(get_db)):
     images = await repository_images.get_all_images(db)
     return images
 
