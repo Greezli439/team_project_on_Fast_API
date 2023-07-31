@@ -4,12 +4,12 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from src.database.models import User
-from src.schemas import UserModel, UserUpdate
+from src.schemas import UserModel, UserUpdate, UserBan, UserChangeRole
 from src.services.users import number_of_images_per_user as number_images
 
  
-async def get_users(db: Session):
-    users = db.query(User)
+async def get_users(db: Session) -> list[User] | None:
+    users = db.query(User).all()
     return users
 
 async def get_user_by_email(email: str, db: Session) -> User | None:
@@ -24,9 +24,8 @@ async def get_user_by_username(username: str, db: Session) -> User | None:
 async def create_user(body: UserModel, db: Session) -> User:
     users = await get_users(db)
     new_user = User(**body.dict())
-    if not users.first():
+    if not users[0]:
         new_user.role = 'admin'
-    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -37,7 +36,7 @@ async def update_token(user: User, token: str | None, db: Session) -> None:
     db.commit()
 
 
-async def ban_user(body, db):
+async def ban_user(body: UserBan, db: Session) -> User | None:
     banned_user = db.query(User).filter(User.id == body.user_id).first()
     if banned_user:
         banned_user.banned = body.banned
@@ -46,19 +45,19 @@ async def ban_user(body, db):
     return banned_user
 
 
-async def change_user_role(body, db):
+async def change_user_role(body: UserChangeRole, current_user: User, db: Session) -> User | HTTPException | None:
     user = db.query(User).filter(User.id == body.user_id).first()
     if user:
-        if body.role != 'admin' and len(db.query(User).filter(User.role == 'admin').all()) <= 1:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't change role")
+        if current_user.id == body.user_id:
+            if body.role != 'admin' and len(db.query(User).filter(User.role == 'admin').all()) <= 1:
+                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't change role")
         user.role = body.role
         db.commit()
         db.refresh(user)
     return user
 
 
-async def update(body: UserUpdate, db: Session, current_user: User):
-    
+async def update(body: UserUpdate, db: Session, current_user: User) -> User:    
     current_user.username = body.username
     current_user.information = body.information
     db.commit()

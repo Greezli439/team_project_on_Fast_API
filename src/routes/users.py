@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, HTTPException, Depends, status, Security, Header
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
@@ -21,26 +19,9 @@ router = APIRouter(prefix='/users', tags=["users"])
 security = HTTPBearer()
 
 
-@router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def ban_user(body: UserBan, db: Session = Depends(get_db)):
-    banned_user = await repository_users.ban_user(body, db)
-    if not banned_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return banned_user
-
-
-@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
-    user = await repository_users.change_user_role(body, db)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return user
-
 
 @router.post("/signup", response_model=UserDBRole, status_code=status.HTTP_201_CREATED)
-async def signup(body: UserBase, db: Session = Depends(get_db)):
+async def signup(body: UserBase, db: Session = Depends(get_db)) -> User | HTTPException:
     exist_username = await repository_users.get_user_by_username(body.username, db)
     if exist_username:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
@@ -53,7 +34,7 @@ async def signup(body: UserBase, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenModel)
-async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> dict | HTTPException:
     user = await repository_users.get_user_by_email(body.username, db)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email")
@@ -68,23 +49,14 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
-              status_code=status.HTTP_202_ACCEPTED)
-async def change_user_role(body: UserChangeRole, db: Session = Depends(get_db)):
-    user = await repository_users.change_user_role(body, db)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
-    return user
-
-
 @router.post("/logout")
-async def logout(token_data: Token = Depends(auth_service.oauth2_scheme), db: Session = Depends(get_db)):
+async def logout(token_data: Token = Depends(auth_service.oauth2_scheme), db: Session = Depends(get_db)) -> JSONResponse:
     await auth_service.add_token_to_blacklist(token_data, db)
     return JSONResponse(content={"message": "Successfully logged out"})
 
 
 @router.get('/refresh_token', response_model=TokenModel)
-async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
+async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)) -> dict | HTTPException:
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -99,19 +71,19 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
 
 
 @router.get("/all_users", response_model=list[UserDb], dependencies=[Depends(access_A)])
-async def get_users(db: Session = Depends(get_db)):
+async def get_users(db: Session = Depends(get_db)) -> list[User]:
     users = await repository_users.get_users(db)
     return users
 
 
 @router.get("/me/", response_model=UserImages)
-async def read_users_me(current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
+async def read_users_me(current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)) -> User:
     user = await repository_users.get_user_by_username(current_user.username, db)
     return user
 
 
 @router.get("/{username}", response_model=UserImages)
-async def get_user(username: str, db: Session = Depends(get_db)):
+async def get_user(username: str, db: Session = Depends(get_db)) -> User | HTTPException:
     user = await repository_users.get_user_by_username(username, db)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -120,7 +92,7 @@ async def get_user(username: str, db: Session = Depends(get_db)):
 
 @router.put("/me", response_model=UserDb)
 async def update_user(body: UserUpdate, db: Session = Depends(get_db),
-                       current_user: User = Depends(auth_service.get_current_user)):
+                       current_user: User = Depends(auth_service.get_current_user)) -> User | HTTPException:
 
     exist_username = await repository_users.get_user_by_username(body.username, db)
     if exist_username:
@@ -128,4 +100,23 @@ async def update_user(body: UserUpdate, db: Session = Depends(get_db),
     user = await repository_users.update(body, db, current_user)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found!")
+    return user
+
+
+@router.patch("/", response_model=UserDBBanned, dependencies=[Depends(access_AM)],
+              status_code=status.HTTP_202_ACCEPTED)
+async def ban_user(body: UserBan, db: Session = Depends(get_db)) -> User | HTTPException:
+    banned_user = await repository_users.ban_user(body, db)
+    if not banned_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
+    return banned_user
+
+
+@router.patch("/change_role", response_model=UserDBRole, dependencies=[Depends(access_A)],
+              status_code=status.HTTP_202_ACCEPTED)
+async def change_user_role(body: UserChangeRole, current_user: User = Depends(auth_service.get_current_user), 
+                            db: Session = Depends(get_db)) -> User | HTTPException:
+    user = await repository_users.change_user_role(body, current_user, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found.")
     return user
