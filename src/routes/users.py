@@ -19,6 +19,7 @@ router = APIRouter(prefix='/users', tags=["users"])
 security = HTTPBearer()
 
 
+
 @router.post("/signup", response_model=UserDBRole, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserBase, db: Session = Depends(get_db)) -> User | HTTPException:
     exist_username = await repository_users.get_user_by_username(body.username, db)

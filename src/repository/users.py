@@ -62,4 +62,3 @@ async def update(body: UserUpdate, db: Session, current_user: User) -> User:
     current_user.information = body.information
     db.commit()
     return current_user
-
