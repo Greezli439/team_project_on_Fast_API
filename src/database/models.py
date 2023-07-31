@@ -30,7 +30,7 @@ class Image(Base):
     image_name = Column(String(150))
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    username = relationship('User', backref="images")
+    username = relationship('User', back_populates="images")
     tags = relationship("Tag", secondary=image_m2m_tag, back_populates="images")
     comments = relationship('Comment', backref="images")
     created_at = Column("created_at", DateTime, default=func.now())
@@ -54,7 +54,7 @@ class Comment(Base):
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
-    
+
 class Role(enum.Enum):
     __tablename__ = 'users_roles'
     admin: str = 'admin'
@@ -73,8 +73,7 @@ class User(Base):
     banned = Column(Boolean, default=False)
     role = Column('role', Enum(Role), default=Role.user)
     information = Column(String, nullable=True)
-    number_of_images = Column(Integer, nullable=True)
-    average_rating = Column(Float, nullable=True)
+    images = relationship('Image', back_populates="username")
 
 
 class Token(Base):
