@@ -75,16 +75,21 @@ class Img:
         return upload_image['url'], upload_image['public_id']
     
     async def expand_image(self, public_id: str)-> str:
-        img = CloudinaryImage(public_id).image(aspect_ratio="16:9", background="gen_fill", width=1500, crop="pad")
-        url = img.split('"')
-        upload_image = cloudinary.uploader.upload(url[1])
+        try:
+            img = CloudinaryImage(public_id).image(aspect_ratio="16:9", background="gen_fill", width=1500, crop="pad")
+            url = img.split('"')
+            upload_image = cloudinary.uploader.upload(url[1])
+        except:
+           raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="change size image")
         return upload_image['url'], upload_image['public_id']
 
     async def vertically_expand_image(self, public_id: str)-> str:
-       
-        img  = CloudinaryImage(public_id).image(aspect_ratio="9:16", background="gen_fill", crop="pad")
-        url = img.split('"')
-        upload_image = cloudinary.uploader.upload(url[1])
+        try:
+            img  = CloudinaryImage(public_id).image(aspect_ratio="9:16", background="gen_fill", crop="pad")
+            url = img.split('"')
+            upload_image = cloudinary.uploader.upload(url[1])
+        except:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="change size image")
         return upload_image['url'], upload_image['public_id']
     
     async def fade_adges_image(self, public_id: str)-> str:
