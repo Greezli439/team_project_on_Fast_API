@@ -1,3 +1,4 @@
+python==3.11
 fastapi==0.100.0
 uvicorn==0.23.1
 sqlalchemy==2.0.19
@@ -8,9 +9,9 @@ python-jose==3.3.0
 python-dotenv==1.0.0
 qrcode==7.4.2
 libgravatar==1.0.4
-passlib==1.7.4
+passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 schedule==1.2.0
 cloudinary==1.33.0
-pydantic==2.1.1
+pydantic[email]==2.1.1
 pillow==10.0.0
