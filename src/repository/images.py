@@ -18,7 +18,7 @@ from src.schemas import ImageChangeSizeModel, ImageChangeColorModel, ImageTransf
 from src.services.images import image_cloudinary
 
 
-async def get_current_user_images(db: Session, user_id: int, user: User):
+async def get_current_user_images(db: Session, user_id: int):
     images = db.query(Image).filter(Image.user_id == user_id).all()
     if images:
         return images

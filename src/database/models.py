@@ -54,7 +54,7 @@ class Comment(Base):
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
 
-    
+
 class Role(enum.Enum):
     __tablename__ = 'users_roles'
     admin: str = 'admin'
