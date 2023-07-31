@@ -1,0 +1,42 @@
+.user-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    width: 300px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 {
+    margin-bottom: 5px;
+  }
+  
+  p {
+    margin: 0;
+  }
+
+  /* Стилі для images */
+
+.image-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.image-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.comment-card {
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px 0;
+}
+  
