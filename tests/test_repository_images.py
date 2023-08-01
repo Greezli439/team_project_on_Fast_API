@@ -27,7 +27,7 @@ from src.repository.images import (
 )
 
 
-class TestGetAllImages(unittest.TestCase):
+class TestImages(unittest.TestCase):
     def setUp(self):
         self.session = MagicMock(spec=Session)
         self.user = User(id=1)
