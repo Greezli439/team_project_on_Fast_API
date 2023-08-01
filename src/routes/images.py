@@ -167,7 +167,7 @@ async def make_black_white_image(body: ImageTransformModel,
     return {"image": db_image, "details": detail}
 
 
-@router.get('/qrcode/', response_model=GetQRCode)
+@router.get('/qrcode/{id}', response_model=GetQRCode)
 async def get_qr_code(id: int, db: Session = Depends(get_db)):
     base64_encoded_img = await repository_images.get_qr_code(id, db)
     if not base64_encoded_img:

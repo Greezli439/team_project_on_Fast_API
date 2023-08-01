@@ -1,8 +1,7 @@
 // Отримати доступ до локального токену з localStorage
 const accessToken = localStorage.getItem('access_token');
 
-// URL вашого серверу
-const serverURL = 'http://127.0.0.1:8000/api/images/'; // Замініть на свій URL
+const serverURL = 'http://127.0.0.1:8000/api/images/';
 
 // Функція для взаємодії з сервером та отримання даних
 async function getData() {
@@ -49,10 +48,10 @@ async function getData() {
       const tags = item.tags.map(tag => `<a href="http://127.0.0.1:5500/images_by_tag.html?tag_id=${tag.id}">${tag.name_tag}</a>`).join(', ');
       const username = item.username.username
       const id = item.username.id
-      console.log(id)
+      const image_id = item.id
       imageCard.innerHTML = `
         <p><a href="http://127.0.0.1:5500/user.html?username=${username}&userId=${id}">${username}</a></p>
-        <img src="${imageUrl}" alt="${description}">
+        <a href="/get_qr.html?Id=${image_id}"><img src="${imageUrl}" alt="${description}"></a>
         <p>${description}</p>
         <p>Tags: ${tags}</p>
       `;
