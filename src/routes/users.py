@@ -98,8 +98,8 @@ async def update_user(body: UserUpdate, db: Session = Depends(get_db),
     if exist_username:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
     user = await repository_users.update(body, db, current_user)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found!")
+    # if user is None:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found!")
     return user
 
 

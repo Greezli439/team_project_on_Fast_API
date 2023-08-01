@@ -24,7 +24,7 @@ async def get_user_by_username(username: str, db: Session) -> User | None:
 async def create_user(body: UserModel, db: Session) -> User:
     users = await get_users(db)
     new_user = User(**body.dict())
-    if not users[0]:
+    if not users:
         new_user.role = 'admin'
     db.add(new_user)
     db.commit()
