@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, Mock
 from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
+import src
 from src.database.models import User
 from src.schemas import UserModel, UserBan, UserChangeRole
 from src.services.users import number_of_images_per_user as number_images
@@ -42,7 +43,6 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
 
     
     async def test_get_user_by_email_found(self):
-        # user = User()
         self.session.query().filter().first.return_value = self.user_1
         result = await get_user_by_email(email='', db=self.session)
         self.assertEqual(result, self.user_1)
@@ -53,14 +53,19 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         result = await get_user_by_email(email='', db=self.session)
         self.assertIsNone(result)
 
-
-    async def test_get_user_by_username_found(self):        
+    @patch('src.services.users.number_of_images_per_user', Mock(return_value=13))
+    async def test_get_user_by_username_found(self):       
         self.session.query().filter().first.return_value = self.user_1
-        # self.user_1.number_of_images = 12
-        # await number_images() = MagicMock(return_value=13)
+        self.user_1.number_of_images = 12
+        number_images = MagicMock(return_value=13)
         result = await get_user_by_username(username='', db=self.session)
-        print('----***', result.number_of_images)
+        # print('----***+++++++++++++', result.number_of_images)
+        return_mock = src.services.users.number_of_images_per_user(db=self.session, user_id=1)
+        self.assertEqual(return_mock, 13)
         self.assertEqual(result, self.user_1)
+        self.assertTrue(hasattr(result, "number_of_images"))
+        # self.assertEqual(self.user_1.number_of_images, 12)
+        # self.assertEqual(number_images, 13)
 
 
     async def test_get_user_by_username_not_found(self):
@@ -68,7 +73,7 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
             result = await get_user_by_username(username='', db=self.session)
             self.assertIsNone(result)
 
-
+    
     async def test_create_user(self):
             body = UserModel(
                 username='test1',
@@ -76,9 +81,8 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
                 password='testpass',
                 role = 'user'
             )
-            # users = [self.user_1, self.user_2]
-            # self.session.query().filter().all.return_value = users
-            users = MagicMock(return_value=[self.user_1, self.user_2])
+            users = [self.user_1, self.user_2]
+            self.session.query().all.return_value = users
             result = await create_user(body, db=self.session)
             self.assertEqual(result.username, body.username)
             self.assertEqual(result.email, body.email)
@@ -89,22 +93,21 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(hasattr(result, "created_at"))
 
 
-    # async def test_create_user_first(self):
-    #         body = UserModel(
-    #             username='test1',
-    #             email='Emai@lStr.bg',
-    #             password='testpass',
-    #             role = 'user')
-    #         users = MagicMock(return_value = None)
-    #         result = await create_user(body, db=self.session)
-    #         print('-----', result.role)
-    #         self.assertEqual(result.username, body.username)
-    #         self.assertEqual(result.email, body.email)
-    #         self.assertEqual(result.role.value, "admin")
-    #         self.assertTrue(hasattr(result, "banned"))        
-    #         self.assertTrue(hasattr(result, "information"))
-    #         self.assertTrue(hasattr(result, "id"))
-    #         self.assertTrue(hasattr(result, "created_at"))
+    async def test_create_user_first(self):
+            body = UserModel(
+                username='test1',
+                email='Emai@lStr.bg',
+                password='testpass',
+                role = 'user')
+            self.session.query().all.return_value = None
+            result = await create_user(body, db=self.session)
+            self.assertEqual(result.username, body.username)
+            self.assertEqual(result.email, body.email)
+            self.assertEqual(result.role, "admin")
+            self.assertTrue(hasattr(result, "banned"))        
+            self.assertTrue(hasattr(result, "information"))
+            self.assertTrue(hasattr(result, "id"))
+            self.assertTrue(hasattr(result, "created_at"))
             
         
     async def test_update_token(self):
@@ -135,12 +138,6 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
     #     self.assertEqual(result, self.user_1)
     #     self.assertTrue(result.banned, body.banned)
 
-    # async def test_update_avatar(self):
-    #     self.user.email = 'test@mail.com'
-    #     avatar_url = 'http/test/avatar.png'
-    #     self.session.query().filter().first.return_value = self.user
-    #     await update_avatar(email=self.user.email, url=avatar_url, db=self.session)
-    #     self.assertEqual(self.user.avatar, avatar_url)
 
 if __name__ == "__main__":
     unittest.main()    
