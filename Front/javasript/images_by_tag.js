@@ -5,7 +5,7 @@ const accessToken = localStorage.getItem('access_token');
 async function getData(tagId) {
     try {
       // Запит до серверу з токеном
-      const response = await fetch('https://legitimate-jaquenetta-greezli439.koyeb.app/api/images/tag/' + tagId, {
+      const response = await fetch('https://margatsni-greezli439.koyeb.app/api/images/tag/' + tagId, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }

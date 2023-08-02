@@ -20,7 +20,7 @@ const requestOptions = {
     redirect: 'follow',
 }
 
- const responce = await fetch('https://legitimate-jaquenetta-greezli439.koyeb.app/api/users/login', requestOptions,)
+ const responce = await fetch('https://margatsni-greezli439.koyeb.app/api/users/login', requestOptions,)
 
 
 if (responce.status == 200){
