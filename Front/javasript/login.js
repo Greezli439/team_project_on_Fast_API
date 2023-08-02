@@ -20,7 +20,7 @@ const requestOptions = {
     redirect: 'follow',
 }
 
- const responce = await fetch('http://127.0.0.1:8000/api/users/login', requestOptions,)
+ const responce = await fetch('https://legitimate-jaquenetta-greezli439.koyeb.app/api/users/login', requestOptions,)
 
 
 if (responce.status == 200){
