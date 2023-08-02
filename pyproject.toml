@@ -29,8 +29,9 @@ pytest = "^7.4.0"
 
 
 
+
 [tool.poetry.group.dev.dependencies]
-qrcode = "^7.4.2"
+sphinx = "^7.1.2"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
@@ -39,5 +40,4 @@ pythonpath = ["."]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pytest.ini_options]
-pythonpath = ["."]
+

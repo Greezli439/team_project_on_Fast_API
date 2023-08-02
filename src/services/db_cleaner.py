@@ -11,10 +11,10 @@ from src.database.db_connection import get_db
 
 def clean_db():
     """
-        Clean the token_black_list table by removing tokens older than 4 hours.
+        Clean the token_black_list table by removing tokens older than 2 hours.
 
     This function queries the token_black_list table, checks each token's creation time,
-    and deletes the tokens that are older than 4 hours from the current time.
+    and deletes the tokens that are older than 2 hours from the current time.
 
     Note:
     - This function assumes that the `Token` and `SessionLocal` classes are defined and imported from the appropriate module.

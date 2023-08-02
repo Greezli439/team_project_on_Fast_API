@@ -95,9 +95,9 @@ async def update_tag(body: TagModel, tag_id: int, db: Session = Depends(get_db))
 
     Raises:
         HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                      detail="Tag not found or you don't have enough rules to update"):
-            If the tag with the specified ID does not exist, or the user does not have sufficient
-            privileges to update the tag.
+        detail="Tag not found or you don't have enough rules to update"):
+        If the tag with the specified ID does not exist, or the user does not have sufficient
+        privileges to update the tag.
 
     """
     tag = await repository_tags.update_tag(tag_id, body, db)
@@ -120,9 +120,9 @@ async def remove_tag(tag_id: int, db: Session = Depends(get_db)):
 
     Raises:
         HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                      detail="Tag not found or you don't have enough rules to delete"):
-            If the tag with the specified ID does not exist, or the user does not have sufficient
-            privileges to delete the tag.
+        detail="Tag not found or you don't have enough rules to delete"):
+        If the tag with the specified ID does not exist, or the user does not have sufficient
+        privileges to delete the tag.
 
     """
     tag = await repository_tags.remove_tag(tag_id, db)
@@ -135,7 +135,7 @@ async def remove_tag(tag_id: int, db: Session = Depends(get_db)):
 @router.delete("/nametag/{name_tag}", response_model=TagResponse, dependencies=[Depends(access_AM)])
 async def remove_name_tag(name_tag: str, db: Session = Depends(get_db)):
     """
-        Remove a tag by its name.
+    Remove a tag by its name.
 
     :param name_tag (str): The name of the tag to remove.
     :param db (Session): The SQLAlchemy database session to use for the query.
@@ -145,9 +145,9 @@ async def remove_name_tag(name_tag: str, db: Session = Depends(get_db)):
 
     Raises:
         HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                      detail="Tag not found or you don't have enough rules to delete"):
-            If the tag with the specified name does not exist, or the user does not have sufficient
-            privileges to delete the tag.
+        detail="Tag not found or you don't have enough rules to delete"):
+        If the tag with the specified name does not exist, or the user does not have sufficient
+        privileges to delete the tag.
 
     """
     tag = await repository_tags.remove_name_tag(name_tag, db)
