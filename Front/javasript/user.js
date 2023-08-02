@@ -6,7 +6,7 @@ const accessToken = localStorage.getItem('access_token');
 async function getUserInfo(username) {
   try {
     // Запит до серверу з токеном
-    const response = await fetch(`http://127.0.0.1:8000/api/users/` + username, {
+    const response = await fetch(`https://legitimate-jaquenetta-greezli439.koyeb.app/api/users/` + username, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
