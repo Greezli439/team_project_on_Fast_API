@@ -10,6 +10,16 @@ from src.database.db_connection import get_db
 
 
 def clean_db():
+    """
+        Clean the token_black_list table by removing tokens older than 4 hours.
+
+    This function queries the token_black_list table, checks each token's creation time,
+    and deletes the tokens that are older than 4 hours from the current time.
+
+    Note:
+    - This function assumes that the `Token` and `SessionLocal` classes are defined and imported from the appropriate module.
+
+    """
     session = SessionLocal()
 
     tokens = session.query(Token).all()
@@ -23,6 +33,18 @@ def clean_db():
     session.close()
 
 def clean_engine():
+    """
+        Run a cleaning job using a scheduler to clean the database regularly.
+
+    This function schedules the `clean_db()` function to be executed every hour.
+    The `clean_db()` function is responsible for cleaning the token_black_list table,
+    removing tokens that are older than 4 hours from the current time.
+
+    Note:
+    - This function assumes that the `clean_db()` function is defined and imported from the appropriate module.
+    - The `schedule` library is used to create the scheduler.
+
+    """
     schedule.every().hour.do(clean_db)
     while True:
         schedule.run_pending()
