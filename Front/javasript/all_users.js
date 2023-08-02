@@ -2,7 +2,7 @@
 const accessToken = localStorage.getItem('accessToken');
 // const accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtaWtlQGdtYWlsLmNvbSIsImlhdCI6MTY5MDQwMTU5OSwiZXhwIjoxNjkwNDAzMzk5LCJzY29wZSI6ImFjY2Vzc190b2tlbiJ9.lO2PUWv59lKuYCULv5V4C5gNJFrfzooIK5Kkz_xGNr0;
 // URL вашого серверу
-const serverURL = 'http://127.0.0.1:8000/api/users/all_users'; // Замініть на свій URL
+const serverURL = 'https://legitimate-jaquenetta-greezli439.koyeb.app/api/users/all_users'; // Замініть на свій URL
 
 // Функція для взаємодії з сервером та отримання даних
 async function getData() {

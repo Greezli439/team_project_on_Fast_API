@@ -1,7 +1,7 @@
 // Отримати доступ до локального токену з localStorage
 const accessToken = localStorage.getItem('access_token');
 
-const serverURL = 'http://127.0.0.1:8000/api/images/';
+const serverURL = 'https://legitimate-jaquenetta-greezli439.koyeb.app/api/images/';
 
 // Функція для взаємодії з сервером та отримання даних
 async function getData() {
@@ -45,12 +45,12 @@ async function getData() {
       // Отримати URL зображення, опис та теги
       const imageUrl = item.url;
       const description = item.description;
-      const tags = item.tags.map(tag => `<a href="http://127.0.0.1:5500/images_by_tag.html?tag_id=${tag.id}">${tag.name_tag}</a>`).join(', ');
+      const tags = item.tags.map(tag => `<a href="/images_by_tag.html?tag_id=${tag.id}">${tag.name_tag}</a>`).join(', ');
       const username = item.username.username
       const id = item.username.id
       const image_id = item.id
       imageCard.innerHTML = `
-        <p><a href="http://127.0.0.1:5500/user.html?username=${username}&userId=${id}">${username}</a></p>
+        <p><a href="/user.html?username=${username}&userId=${id}">${username}</a></p>
         <a href="/get_qr.html?Id=${image_id}"><img src="${imageUrl}" alt="${description}"></a>
         <p>${description}</p>
         <p>Tags: ${tags}</p>
@@ -74,7 +74,7 @@ async function getData() {
         const username = comment.username.username;
   
         commentCard.innerHTML = `
-          <p><a href="http://127.0.0.1:5500/user.html?username=${username}&userId=${id}"> ${username}:</a> ${commentText}</p>`;
+          <p><a href="/user.html?username=${username}&userId=${id}"> ${username}:</a> ${commentText}</p>`;
   
         commentsContainer.appendChild(commentCard);
       });
