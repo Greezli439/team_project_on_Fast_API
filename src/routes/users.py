@@ -26,7 +26,7 @@ async def signup(body: UserBase, db: Session = Depends(get_db)) -> User | HTTPEx
     Creates the '/signup' route for user registration.
     The signup function for the '/signup' route handles the POST
     operation. It creates a new user if a user with a specified username
-     or email address does not exist. There cannot be two users
+    or email address does not exist. There cannot be two users
     with the same username or email in the system.
     If a user with this username or email
     already exists in the database, the function throws an
