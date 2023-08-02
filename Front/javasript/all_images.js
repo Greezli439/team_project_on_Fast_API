@@ -1,7 +1,7 @@
 // Отримати доступ до локального токену з localStorage
 const accessToken = localStorage.getItem('access_token');
 
-const serverURL = 'https://legitimate-jaquenetta-greezli439.koyeb.app/api/images/';
+const serverURL = 'https://margatsni-greezli439.koyeb.app/api/images/';
 
 // Функція для взаємодії з сервером та отримання даних
 async function getData() {
