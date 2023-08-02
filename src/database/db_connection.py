@@ -13,6 +13,13 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
+    """
+        Get a database session (SQLAlchemy) for the request.
+
+    Yields:
+        Generator[Session, None, None]: A generator that yields the SQLAlchemy database session.
+
+    """
     db = SessionLocal()
     try:
         yield db
