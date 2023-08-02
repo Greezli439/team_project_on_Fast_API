@@ -4,7 +4,7 @@
 async function getImages(username, userId) {
     try {
       // Запит до серверу з токеном
-      const response = await fetch('https://legitimate-jaquenetta-greezli439.koyeb.app/api/images/user/' + userId, {
+      const response = await fetch('https://margatsni-greezli439.koyeb.app/api/images/user/' + userId, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }

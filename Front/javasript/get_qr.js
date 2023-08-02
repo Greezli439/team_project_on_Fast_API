@@ -2,7 +2,7 @@
 const accessToken = localStorage.getItem('accessToken');
 
 async function getImageFromBackend(Id) {
-  const response = await fetch('https://legitimate-jaquenetta-greezli439.koyeb.app/api/images/qrcode/' + Id, {
+  const response = await fetch('https://margatsni-greezli439.koyeb.app/api/images/qrcode/' + Id, {
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
