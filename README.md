@@ -6,7 +6,7 @@
 
 Using our service is very simple. Without installing the application, but with registration.
 
-Go to the page: https://legitimate-jaquenetta-greezli439.koyeb.app/docs#/. 
+Go to the page: https://margatsni-greezli439.koyeb.app/docs#. 
 Here you can familiarize yourself with the functionality and an example of the application. 
 All individual wishes will be taken into account and changes will be made to the project, 
 the team of professionals is always in touch for your front-end developers.
